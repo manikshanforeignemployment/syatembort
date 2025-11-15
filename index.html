@@ -4,91 +4,115 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Manikshan Boat Report System</title>
-<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- jspdf libraries for PDF export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  /* Simple style for table consistency */
-  table th, table td {
-    padding: 8px 10px;
-    border-bottom: 1px solid #e5e7eb; /* tailwind gray-200 */
-    text-align: left;
-    font-size: 14px;
-  }
-  table th {
-    background-color: #f9fafb; /* tailwind gray-50 */
-    font-weight: 600;
-  }
+  * { font-family: 'Inter', system-ui, sans-serif; }
+  body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+  .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+  .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+  table th, table td { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: left; font-size: 14px; }
+  table th { background: linear-gradient(to bottom, #f9fafb, #f3f4f6); font-weight: 600; color: #374151; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+  table tbody tr:hover { background-color: #f9fafb; transition: background-color 0.2s; }
+  .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: all 0.3s; }
+  .btn-primary:hover { transform: scale(1.02); box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3); }
+  .btn-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+  .btn-success:hover { transform: scale(1.02); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
+  .input-field { transition: all 0.2s; border: 2px solid #e5e7eb; }
+  .input-field:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); outline: none; }
+  .section-title { position: relative; display: inline-block; }
+  .section-title::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 60%; height: 3px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 2px; }
+  .animate-in { animation: slideIn 0.5s ease-out; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .stat-card { border-left: 4px solid; }
+  .right { text-align: right; }
 </style>
-<script>
-  // Configure Tailwind to use Inter font
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: {
-          sans: ['Inter', 'system-ui', 'sans-serif'],
-        },
-      },
-    },
-  }
-</script>
 </head>
-<body class="bg-slate-100 font-sans text-slate-900">
+<body>
 
-<header class="bg-indigo-800 text-white shadow-lg">
-  <div class="max-w-6xl mx-auto p-4">
-    <h1 class="text-2xl font-bold tracking-tight">Manikshan Boat Report System</h1>
+<!-- Header -->
+<header class="glass shadow-2xl sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">Manikshan Boats</h1>
+          <p class="text-sm text-gray-600">Report Management System</p>
+        </div>
+      </div>
+      <div class="hidden md:flex items-center space-x-2 bg-white px-4 py-2 rounded-lg shadow-md">
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+        </svg>
+      
+      </div>
+    </div>
   </div>
 </header>
 
-<main class="max-w-6xl mx-auto p-4 md:p-6">
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-  <!-- ======================
-       LANDING PAGE SECTION
-       ====================== -->
-  <section id="landing" class="">
-    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
-      <div class="p-6 md:p-10">
-        <h2 class="text-3xl md:text-4xl font-extrabold text-indigo-900 mb-4">Welcome, Charu!</h2>
-        <p class="text-lg text-slate-600 mb-8">Select a report to get started. All your data will be calculated and ready for export.</p>
-        
-        <!--  -->
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <!-- Landing Page -->
+  <section id="landing" class="animate-in">
+    <div class="glass rounded-2xl shadow-2xl overflow-hidden">
+      <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-12 text-white">
+        <h2 class="text-4xl font-bold mb-3">Welcome,</h2>
+        <p class="text-xl text-blue-100">Select a report type to begin your journey</p>
+      </div>
+      
+      <div class="p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
-          <!-- Departure Card Button -->
-          <div onclick="showSection('departure')" class="group p-6 bg-indigo-50 hover:bg-indigo-100 rounded-lg shadow-md cursor-pointer transition-all border border-indigo-200 hover:shadow-lg">
-            <div class="flex items-start gap-4">
-              <div class="flex-shrink-0 bg-indigo-500 text-white rounded-full p-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 12l-6-6m6 6l-6 6" />
-                </svg>
+          <!-- Departure Card -->
+          <div onclick="showSection('departure')" class="group cursor-pointer card-hover glass rounded-xl p-8 border-2 border-transparent hover:border-blue-500">
+            <div class="flex items-start gap-6">
+              <div class="flex-shrink-0">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
+                  <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                  </svg>
+                </div>
               </div>
-              <div>
-                <h3 class="text-2xl font-bold text-indigo-900 mb-2">Departure Report</h3>
-                <p class="text-slate-700 mb-4">Log all pre-trip expenses: fuel, repairs, salaries, and loans.</p>
-                <span class="font-semibold text-indigo-600 group-hover:underline">Start Departure Report &rarr;</span>
+              <div class="flex-1">
+                <h3 class="text-2xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors">Departure Report</h3>
+                <p class="text-gray-600 mb-4 leading-relaxed">Log all pre-trip expenses including fuel, repairs, salaries, and loans before setting sail.</p>
+                <div class="flex items-center space-x-2 text-blue-600 font-semibold group-hover:translate-x-2 transition-transform">
+                  <span>Start Report</span>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Arrival Card Button -->
-          <div onclick="showSection('arrival')" class="group p-6 bg-teal-50 hover:bg-teal-100 rounded-lg shadow-md cursor-pointer transition-all border border-teal-200 hover:shadow-lg">
-            <div class="flex items-start gap-4">
-              <div class="flex-shrink-0 bg-teal-500 text-white rounded-full p-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l6-6m-6 6l6 6" />
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 12h9" />
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m-3-3a9 9 0 100 12 9 9 0 000-12z" />
-                </svg>
+          <!-- Arrival Card -->
+          <div onclick="showSection('arrival')" class="group cursor-pointer card-hover glass rounded-xl p-8 border-2 border-transparent hover:border-teal-500">
+            <div class="flex items-start gap-6">
+              <div class="flex-shrink-0">
+                <div class="w-16 h-16 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
+                  <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"></path>
+                  </svg>
+                </div>
               </div>
-              <div>
-                <h3 class="text-2xl font-bold text-teal-900 mb-2">Arrival Report</h3>
-                <p class="text-slate-700 mb-4">Record sales, arrival expenses, and calculate final commission.</p>
-                <span class="font-semibold text-teal-600 group-hover:underline">Start Arrival Report &rarr;</span>
+              <div class="flex-1">
+                <h3 class="text-2xl font-bold text-gray-800 mb-3 group-hover:text-teal-600 transition-colors">Arrival Report</h3>
+                <p class="text-gray-600 mb-4 leading-relaxed">Record sales, arrival expenses, and calculate final commission upon return to port.</p>
+                <div class="flex items-center space-x-2 text-teal-600 font-semibold group-hover:translate-x-2 transition-transform">
+                  <span>Start Report</span>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
@@ -98,329 +122,418 @@
     </div>
   </section>
 
-  <!-- ======================
-       DEPARTURE REPORT SECTION
-       ====================== -->
-  <section id="departure" class="hidden">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-3xl font-bold text-indigo-900">Departure Report</h2>
-      <button onclick="showSection('landing')" class="text-sm font-medium text-indigo-600 hover:underline">&larr; Back to Landing Page</button>
+  <!-- Departure Report -->
+  <section id="departure" class="hidden animate-in">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-3xl font-bold text-white section-title mb-2">Departure Report</h2>
+        <p class="text-blue-100">Record all pre-departure expenses and costs</p>
+      </div>
+      <button onclick="showSection('landing')" class="glass px-6 py-3 rounded-lg font-medium text-gray-700 hover:bg-white transition-all flex items-center space-x-2 shadow-lg">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        <span>Back</span>
+      </button>
     </div>
 
-    <!-- Date & Boat -->
-    <div class="bg-white p-4 md:p-6 rounded-lg shadow-md mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- Basic Info -->
+    <div class="glass rounded-xl shadow-lg p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="md:col-span-2">
-          <label for="depDate" class="block text-sm font-medium text-slate-700 mb-1">Date</label>
-          <input type="date" id="depDate" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Date</label>
+          <input type="date" id="depDate" class="input-field w-full px-4 py-3 rounded-lg">
         </div>
         <div>
-          <label for="depBoat" class="block text-sm font-medium text-slate-700 mb-1">Boat</label>
-          <input type="text" id="depBoat" placeholder="Boat name / ID" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Boat Name / ID</label>
+          <input type="text" id="depBoat" placeholder="Enter boat identifier" class="input-field w-full px-4 py-3 rounded-lg">
         </div>
       </div>
     </div>
 
-    <!-- Form Sections -->
     <div class="space-y-6">
       <!-- Loading Expenses -->
-      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold mb-4 text-slate-800">Loading Expenses</h3>
-        <div class="flex flex-col md:flex-row gap-4 mb-4">
-          <input type="text" id="leItem" placeholder="Item description (e.g., loading labour)" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
-          <input type="number" id="lePrice" placeholder="Price (LKR)" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
-          <button onclick="addLoadingExpense()" class="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 transition-colors">Add Cost</button>
+      <div class="glass rounded-xl shadow-lg p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+          <span class="w-2 h-8 bg-blue-500 rounded-full mr-3"></span>
+          Boat Loading Costs
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
+          <input type="text" id="leItem" placeholder="Item description (e.g., loading labour)" class="input-field md:col-span-7 px-4 py-3 rounded-lg">
+          <input type="number" id="lePrice" placeholder="Amount (LKR)" class="input-field md:col-span-3 px-4 py-3 rounded-lg">
+          <button onclick="addLoadingExpense()" class="btn-primary md:col-span-2 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">Add</button>
         </div>
-        <table id="leTable" class="w-full table-auto">
-          <thead><tr><th>Item</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
-          <tbody></tbody>
-        </table>
-        <div class="flex justify-end items-center gap-4 mt-4">
-          <span class="text-slate-600">Loading Expenses Total:</span>
-          <span id="leTotal" class="text-xl font-bold text-indigo-900">LKR 0.00</span>
+        <div class="overflow-x-auto rounded-lg border border-gray-200">
+          <table id="leTable" class="w-full">
+            <thead><tr><th>Item Description</th><th class="right">Amount (LKR)</th><th class="text-center w-32">Action</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="flex justify-end items-center mt-6 pt-6 border-t border-gray-200">
+          <span class="text-gray-600 mr-4">Total:</span>
+          <span id="leTotal" class="text-2xl font-bold text-blue-600">LKR 0.00</span>
         </div>
       </div>
 
-      <!-- Diesel Cost -->
-      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold mb-4 text-slate-800">Diesel Cost</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Diesel -->
+      <div class="glass rounded-xl shadow-lg p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+          <span class="w-2 h-8 bg-blue-500 rounded-full mr-3"></span>
+          Diesel Cost
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label for="dieselLiters" class="block text-sm font-medium text-slate-700 mb-1">Liters</label>
-            <input type="number" id="dieselLiters" step="0.01" min="0" value="0" class="w-full p-2 border border-slate-300 rounded-md shadow-sm">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Liters</label>
+            <input type="number" id="dieselLiters" step="0.01" min="0" value="0" class="input-field w-full px-4 py-3 rounded-lg">
           </div>
           <div>
-            <label for="dieselRate" class="block text-sm font-medium text-slate-700 mb-1">Rate (LKR / litre)</label>
-            <input type="number" id="dieselRate" value="277" step="0.01" class="w-full p-2 border border-slate-300 rounded-md shadow-sm">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Rate (LKR / litre)</label>
+            <input type="number" id="dieselRate" value="277" step="0.01" class="input-field w-full px-4 py-3 rounded-lg">
           </div>
         </div>
-        <div class="flex justify-end items-center gap-4 mt-4">
-          <span class="text-slate-600">Diesel Total:</span>
-          <span id="dieselTotal" class="text-xl font-bold text-indigo-900">LKR 0.00</span>
+        <div class="flex justify-end items-center mt-6 pt-6 border-t border-gray-200">
+          <span class="text-gray-600 mr-4">Total:</span>
+          <span id="dieselTotal" class="text-2xl font-bold text-blue-600">LKR 0.00</span>
         </div>
       </div>
 
       <!-- Boat Value / Repairs -->
-      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold mb-4 text-slate-800">Boat Value / Repairs</h3>
-        <!-- START: New Current Boat Value Field -->
-        <div class="mb-4">
-            <label for="boatValue" class="block text-sm font-medium text-slate-700 mb-1">Current Boat Value (LKR)</label>
-            <input type="number" id="boatValue" value="10000000" step="1000" class="w-full md:w-1/2 p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+      <div class="glass rounded-xl shadow-lg p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+          <span class="w-2 h-8 bg-blue-500 rounded-full mr-3"></span>
+          Current Boat Value & Repairs
+        </h3>
+        <div class="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Current Boat Value (LKR)</label>
+          <input type="number" id="boatValue" value="10000000" step="1000" class="input-field w-full px-4 py-3 rounded-lg">
         </div>
-        <!-- END: New Current Boat Value Field -->
-        <div class="flex flex-col md:flex-row gap-4 mb-4">
-          <input type="text" id="repairDesc" placeholder="e.g., engine service" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
-          <input type="number" id="repairCost" value="0" min="0" step="0.01" placeholder="Additional Repair Cost (LKR)" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
-          <button onclick="addRepair()" class="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 transition-colors">Add Repair</button>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
+          <input type="text" id="repairDesc" placeholder="Repair description (e.g., engine service)" class="input-field md:col-span-7 px-4 py-3 rounded-lg">
+          <input type="number" id="repairCost" value="0" min="0" step="0.01" placeholder="Cost (LKR)" class="input-field md:col-span-3 px-4 py-3 rounded-lg">
+          <button onclick="addRepair()" class="btn-primary md:col-span-2 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">Add</button>
         </div>
-        <table id="repairTable" class="w-full table-auto">
-          <thead><tr><th>Description</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
-          <tbody></tbody>
-        </table>
-        <div class="flex justify-end items-center gap-4 mt-4">
-          <span class="text-slate-600">Boat Value & Repairs Total:</span>
-          <span id="repairsTotal" class="text-xl font-bold text-indigo-900">LKR 0.00</span>
+        <div class="overflow-x-auto rounded-lg border border-gray-200">
+          <table id="repairTable" class="w-full">
+            <thead><tr><th>Repair Description</th><th class="right">Amount (LKR)</th><th class="text-center w-32">Action</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="flex justify-end items-center mt-6 pt-6 border-t border-gray-200">
+          <span class="text-gray-600 mr-4">Total:</span>
+          <span id="repairsTotal" class="text-2xl font-bold text-blue-600">LKR 0.00</span>
         </div>
       </div>
 
       <!-- Salary -->
-      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold mb-4 text-slate-800">Salary</h3>
-        <div class="flex flex-col md:flex-row gap-4 mb-4">
-          <input type="text" id="salaryName" placeholder="Employee/Staff Name" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
-          <input type="number" id="salaryAmount" placeholder="Amount (LKR)" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
-          <button onclick="addSalary()" class="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 transition-colors">Add Salary</button>
+      <div class="glass rounded-xl shadow-lg p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+          <span class="w-2 h-8 bg-blue-500 rounded-full mr-3"></span>
+          Salary Payments
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
+          <input type="text" id="salaryName" placeholder="Employee/Staff name" class="input-field md:col-span-7 px-4 py-3 rounded-lg">
+          <input type="number" id="salaryAmount" placeholder="Amount (LKR)" class="input-field md:col-span-3 px-4 py-3 rounded-lg">
+          <button onclick="addSalary()" class="btn-primary md:col-span-2 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">Add</button>
         </div>
-        <table id="salaryTable" class="w-full table-auto">
-          <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
-          <tbody></tbody>
-        </table>
-        <div class="flex justify-end items-center gap-4 mt-4">
-          <span class="text-slate-600">Salary Total:</span>
-          <span id="salaryTotal" class="text-xl font-bold text-indigo-900">LKR 0.00</span>
+        <div class="overflow-x-auto rounded-lg border border-gray-200">
+          <table id="salaryTable" class="w-full">
+            <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="text-center w-32">Action</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="flex justify-end items-center mt-6 pt-6 border-t border-gray-200">
+          <span class="text-gray-600 mr-4">Total:</span>
+          <span id="salaryTotal" class="text-2xl font-bold text-blue-600">LKR 0.00</span>
         </div>
       </div>
 
       <!-- Loans -->
-      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold mb-4 text-slate-800">Loan Summary</h3>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Current Loans -->
+      <div class="glass rounded-xl shadow-lg p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+          <span class="w-2 h-8 bg-blue-500 rounded-full mr-3"></span>
+          Loan Summary
+        </h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Current Loans</label>
-            <div class="flex flex-col md:flex-row gap-2 mb-3">
-              <input type="text" id="curLoanName" placeholder="Name" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
-              <input type="number" id="curLoanAmount" placeholder="LKR" class="md:w-32 p-2 border border-slate-300 rounded-md shadow-sm">
-              <button onclick="addLoan('current')" class="bg-indigo-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-600 transition-colors">Add</button>
+            <label class="block text-sm font-bold text-gray-700 mb-4 uppercase tracking-wide">Current Loans</label>
+            <div class="flex gap-2 mb-4">
+              <input type="text" id="curLoanName" placeholder="Name" class="input-field flex-1 px-4 py-2 rounded-lg">
+              <input type="number" id="curLoanAmount" placeholder="LKR" class="input-field w-32 px-4 py-2 rounded-lg">
+              <button onclick="addLoan('current')" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors font-semibold">Add</button>
             </div>
-            <table id="curLoanTable" class="w-full table-auto">
-              <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
-              <tbody></tbody>
-            </table>
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+              <table id="curLoanTable" class="w-full">
+                <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="text-center w-24">Action</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
           </div>
-          <!-- Previous Loans -->
           <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Previous Loans</label>
-            <div class="flex flex-col md:flex-row gap-2 mb-3">
-              <input type="text" id="prevLoanName" placeholder="Name" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
-              <input type="number" id="prevLoanAmount" placeholder="LKR" class="md:w-32 p-2 border border-slate-300 rounded-md shadow-sm">
-              <button onclick="addLoan('previous')" class="bg-indigo-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-600 transition-colors">Add</button>
+            <label class="block text-sm font-bold text-gray-700 mb-4 uppercase tracking-wide">Previous Loans</label>
+            <div class="flex gap-2 mb-4">
+              <input type="text" id="prevLoanName" placeholder="Name" class="input-field flex-1 px-4 py-2 rounded-lg">
+              <input type="number" id="prevLoanAmount" placeholder="LKR" class="input-field w-32 px-4 py-2 rounded-lg">
+              <button onclick="addLoan('previous')" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors font-semibold">Add</button>
             </div>
-            <table id="prevLoanTable" class="w-full table-auto">
-              <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
-              <tbody></tbody>
-            </table>
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+              <table id="prevLoanTable" class="w-full">
+                <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="text-center w-24">Action</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
           </div>
         </div>
-        <div class="flex justify-end items-center gap-4 mt-4 border-t pt-4">
-          <span class="text-slate-600">Total Due Loans:</span>
-          <span id="loanTotal" class="text-xl font-bold text-indigo-900">LKR 0.00</span>
+        <div class="flex justify-end items-center mt-6 pt-6 border-t border-gray-200">
+          <span class="text-gray-600 mr-4">Total Due Loans:</span>
+          <span id="loanTotal" class="text-2xl font-bold text-blue-600">LKR 0.00</span>
         </div>
       </div>
 
-      <!-- Departure Totals -->
-      <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg">
-        <h3 class="text-xl font-semibold mb-4 text-slate-800">Departure Totals</h3>
-        <div class="space-y-2">
-          <!-- START: Re-ordered and Re-titled Summary -->
-          <div class="flex justify-between items-center"><span class="text-slate-600">Boat Loading cost</span><span id="summary_le" class="font-medium text-slate-800">LKR 0.00</span></div>
-          <div class="flex justify-between items-center"><span class="text-slate-600">Total Due Loans</span><span id="summary_loans" class="font-medium text-slate-800">LKR 0.00</span></div>
-          <div class="flex justify-between items-center"><span class="text-slate-600">Current Value of the Boat</span><span id="summary_repairs" class="font-medium text-slate-800">LKR 0.00</span></div>
-          <div class="flex justify-between items-center"><span class="text-slate-600">Diesel</span><span id="summary_diesel" class="font-medium text-slate-800">LKR 0.00</span></div>
-          <div class="flex justify-between items-center"><span class="text-slate-600">Salary</span><span id="summary_salary" class="font-medium text-slate-800">LKR 0.00</span></div>
-          <!-- END: Re-ordered and Re-titled Summary -->
+      <!-- Summary -->
+      <div class="glass rounded-xl shadow-xl p-8 bg-gradient-to-br from-blue-50 to-purple-50">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">Departure Summary</h3>
+        <div class="space-y-4">
+          <div class="stat-card bg-white rounded-lg p-4 border-blue-500">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600 font-medium">Boat Loading Cost</span>
+              <span id="summary_le" class="text-lg font-bold text-gray-800">LKR 0.00</span>
+            </div>
+          </div>
+          <div class="stat-card bg-white rounded-lg p-4 border-purple-500">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600 font-medium">Total Due Loans</span>
+              <span id="summary_loans" class="text-lg font-bold text-gray-800">LKR 0.00</span>
+            </div>
+          </div>
+          <div class="stat-card bg-white rounded-lg p-4 border-indigo-500">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600 font-medium">Current Value of the Boat</span>
+              <span id="summary_repairs" class="text-lg font-bold text-gray-800">LKR 0.00</span>
+            </div>
+          </div>
+          <div class="stat-card bg-white rounded-lg p-4 border-blue-500">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600 font-medium">Diesel</span>
+              <span id="summary_diesel" class="text-lg font-bold text-gray-800">LKR 0.00</span>
+            </div>
+          </div>
+          <div class="stat-card bg-white rounded-lg p-4 border-teal-500">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600 font-medium">Salary</span>
+              <span id="summary_salary" class="text-lg font-bold text-gray-800">LKR 0.00</span>
+            </div>
+          </div>
         </div>
-        <div class="flex justify-between items-center mt-4 pt-4 border-t border-indigo-200">
-          <span class="text-xl font-bold text-indigo-900">Total Amount (LKR)</span>
-          <span id="departureGrand" class="text-2xl font-extrabold text-indigo-900">LKR 0.00</span>
+        <div class="mt-8 pt-6 border-t-2 border-blue-300 bg-white rounded-lg p-6 shadow-lg">
+          <div class="flex justify-between items-center">
+            <span class="text-2xl font-bold text-gray-800">Total Amount</span>
+            <span id="departureGrand" class="text-3xl font-extrabold text-blue-600">LKR 0.00</span>
+          </div>
         </div>
       </div>
 
-      <!-- PDF Export Button -->
-      <div class="text-right mt-6">
-          <button onclick="exportDeparturePDF()" class="bg-green-600 text-white px-6 py-3 rounded-md shadow-lg hover:bg-green-700 transition-all font-semibold text-lg">
-            Export Departure Report (PDF)
-          </button>
+      <!-- Export -->
+      <div class="text-right">
+        <button onclick="exportDeparturePDF()" class="btn-success text-white px-8 py-4 rounded-lg font-bold text-lg shadow-xl flex items-center justify-center space-x-3 ml-auto">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          <span>Export Departure Report (PDF)</span>
+        </button>
       </div>
     </div>
   </section>
 
-  <!-- ======================
-       ARRIVAL REPORT SECTION
-       ====================== -->
-  <section id="arrival" class="hidden">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-3xl font-bold text-teal-900">Arrival Report</h2>
-      <button onclick="showSection('landing')" class="text-sm font-medium text-teal-600 hover:underline">&larr; Back to Landing Page</button>
+  <!-- Arrival Report -->
+  <section id="arrival" class="hidden animate-in">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-3xl font-bold text-white section-title mb-2">Arrival Report</h2>
+        <p class="text-blue-100">Record all sales and arrival expenses</p>
+      </div>
+      <button onclick="showSection('landing')" class="glass px-6 py-3 rounded-lg font-medium text-gray-700 hover:bg-white transition-all flex items-center space-x-2 shadow-lg">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        <span>Back</span>
+      </button>
     </div>
 
-    <!-- Date & Boat -->
-    <div class="bg-white p-4 md:p-6 rounded-lg shadow-md mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- Basic Info -->
+    <div class="glass rounded-xl shadow-lg p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="md:col-span-2">
-          <label for="arrDate" class="block text-sm font-medium text-slate-700 mb-1">Date</label>
-          <input type="date" id="arrDate" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Date</label>
+          <input type="date" id="arrDate" class="input-field w-full px-4 py-3 rounded-lg">
         </div>
         <div>
-          <label for="arrBoat" class="block text-sm font-medium text-slate-700 mb-1">Boat</label>
-          <input type="text" id="arrBoat" placeholder="Boat name / ID" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Boat Name / ID</label>
+          <input type="text" id="arrBoat" placeholder="Enter boat identifier" class="input-field w-full px-4 py-3 rounded-lg">
         </div>
       </div>
     </div>
     
     <div class="space-y-6">
-      <!-- Sales Table -->
-      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold mb-4 bg-slate-900 text-white p-2 rounded-md">Sales (Variety / KG / Amount per KG)</h3>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-          <input type="text" id="saleVariety" placeholder="Variety (e.g., Tuna)" class="md:col-span-2 p-2 border border-slate-300 rounded-md shadow-sm">
-          <input type="number" id="saleKg" placeholder="KG" step="0.01" class="p-2 border border-slate-300 rounded-md shadow-sm">
-          <input type="number" id="saleRate" placeholder="Amount per KG" step="0.01" class="p-2 border border-slate-300 rounded-md shadow-sm">
+      <!-- Sales -->
+      <div class="glass rounded-xl shadow-lg p-6">
+        <div class="bg-gradient-to-r from-teal-500 to-teal-600 -mx-6 -mt-6 px-6 py-4 mb-6 rounded-t-xl">
+          <h3 class="text-xl font-bold text-white flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Sales Records (Variety / KG / Rate per KG)
+          </h3>
         </div>
-        <button onclick="addSale()" class="w-full bg-teal-600 text-white px-4 py-2 rounded-md shadow-lg hover:bg-teal-700 transition-colors mb-4 font-bold">Add New Sale Entry</button>
-        <table id="saleTable" class="w-full table-auto">
-          <thead><tr><th>Variety</th><th class="right">KG</th><th class="right">Rate / KG</th><th class="right">Total</th><th class="w-24">Action</th></tr></thead>
-          <tbody></tbody>
-        </table>
-        <div class="flex justify-end items-center gap-4 mt-4">
-          <span class="text-slate-600">Sales Grand Total:</span>
-          <span id="salesGrand" class="text-xl font-bold text-teal-900">LKR 0.00</span>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
+          <input type="text" id="saleVariety" placeholder="Variety (e.g., Tuna)" class="input-field md:col-span-5 px-4 py-3 rounded-lg">
+          <input type="number" id="saleKg" placeholder="KG" step="0.01" class="input-field md:col-span-3 px-4 py-3 rounded-lg">
+          <input type="number" id="saleRate" placeholder="Rate per KG" step="0.01" class="input-field md:col-span-2 px-4 py-3 rounded-lg">
+          <button onclick="addSale()" class="btn-primary md:col-span-2 text-white px-6 py-3 rounded-lg font-bold shadow-lg">Add Sale</button>
+        </div>
+        <div class="overflow-x-auto rounded-lg border border-gray-200">
+          <table id="saleTable" class="w-full">
+            <thead><tr><th>Variety</th><th class="right">KG</th><th class="right">Rate/KG (LKR)</th><th class="right">Total (LKR)</th><th class="text-center w-32">Action</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="flex justify-end items-center mt-6 pt-6 border-t border-gray-200 bg-teal-50 -mx-6 -mb-6 px-6 py-4 rounded-b-xl">
+          <span class="text-gray-700 font-semibold mr-4">Sales Grand Total:</span>
+          <span id="salesGrand" class="text-2xl font-bold text-teal-600">LKR 0.00</span>
         </div>
       </div>
 
       <!-- Arrival Expenses -->
-      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold mb-4 text-slate-800">Arrival Expenses</h3>
-        <div class="flex flex-col md:flex-row gap-4 mb-4">
-          <input type="text" id="aeItem" placeholder="Expense item (e.g., unloading)" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
-          <input type="number" id="aePrice" placeholder="Amount (LKR)" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
-          <button onclick="addArrivalExpense()" class="w-full md:w-auto bg-teal-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-teal-700 transition-colors">Add Expense</button>
+      <div class="glass rounded-xl shadow-lg p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+          <span class="w-2 h-8 bg-teal-500 rounded-full mr-3"></span>
+          Arrival Expenses
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
+          <input type="text" id="aeItem" placeholder="Expense item (e.g., unloading)" class="input-field md:col-span-7 px-4 py-3 rounded-lg">
+          <input type="number" id="aePrice" placeholder="Amount (LKR)" class="input-field md:col-span-3 px-4 py-3 rounded-lg">
+          <button onclick="addArrivalExpense()" class="btn-primary md:col-span-2 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">Add</button>
         </div>
-        <table id="aeTable" class="w-full table-auto">
-          <thead><tr><th>Item</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
-          <tbody></tbody>
-        </table>
-        <div class="flex justify-end items-center gap-4 mt-4">
-          <span class="text-slate-600">Arrival Expenses Total:</span>
-          <span id="aeTotal" class="text-xl font-bold text-teal-900">LKR 0.00</span>
+        <div class="overflow-x-auto rounded-lg border border-gray-200">
+          <table id="aeTable" class="w-full">
+            <thead><tr><th>Item Description</th><th class="right">Amount (LKR)</th><th class="text-center w-32">Action</th></tr></thead>
+            <tbody></tbody>
+          </table>
         </div>
-      </div>
-      
-      <!-- Loans (Arrival-side) -->
-      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold mb-4 text-slate-800">Loans (Arrival)</h3>
-        <div class="flex flex-col md:flex-row gap-4 mb-4">
-          <input type="text" id="arrLoanName" placeholder="Name" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
-          <input type="number" id="arrLoanAmt" placeholder="Amount LKR" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
-          <button onclick="addArrivalLoan()" class="w-full md:w-auto bg-teal-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-teal-700 transition-colors">Add Loan</button>
-        </div>
-        <table id="arrLoanTable" class="w-full table-auto">
-          <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
-          <tbody></tbody>
-        </table>
-        <div class="flex justify-end items-center gap-4 mt-4">
-          <span class="text-slate-600">Arrival Loans Total:</span>
-          <span id="arrLoanTotal" class="text-xl font-bold text-teal-900">LKR 0.00</span>
+        <div class="flex justify-end items-center mt-6 pt-6 border-t border-gray-200">
+          <span class="text-gray-600 mr-4">Total:</span>
+          <span id="aeTotal" class="text-2xl font-bold text-teal-600">LKR 0.00</span>
         </div>
       </div>
       
-      <!-- Commission & Final Summary -->
-      <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg">
-        <h3 class="text-xl font-semibold mb-4 text-slate-800">Summary & Commission</h3>
-        <div class="space-y-3">
-          <div class="flex justify-between items-center"><span class="text-slate-600">Sales Grand Total</span><span id="sum_sales" class="font-medium text-slate-800">LKR 0.00</span></div>
-          <div class="flex justify-between items-center"><span class="text-slate-600">Arrival Expenses</span><span id="sum_aexp" class="font-medium text-slate-800">LKR 0.00</span></div>
-          <div class="flex justify-between items-center"><span class="text-slate-600">Loans (Arrival)</span><span id="sum_aloan" class="font-medium text-slate-800">LKR 0.00</span></div>
+      <!-- Arrival Loans -->
+      <div class="glass rounded-xl shadow-lg p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+          <span class="w-2 h-8 bg-teal-500 rounded-full mr-3"></span>
+          Loans (Arrival)
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
+          <input type="text" id="arrLoanName" placeholder="Name" class="input-field md:col-span-7 px-4 py-3 rounded-lg">
+          <input type="number" id="arrLoanAmt" placeholder="Amount (LKR)" class="input-field md:col-span-3 px-4 py-3 rounded-lg">
+          <button onclick="addArrivalLoan()" class="btn-primary md:col-span-2 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">Add</button>
+        </div>
+        <div class="overflow-x-auto rounded-lg border border-gray-200">
+          <table id="arrLoanTable" class="w-full">
+            <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="text-center w-32">Action</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="flex justify-end items-center mt-6 pt-6 border-t border-gray-200">
+          <span class="text-gray-600 mr-4">Total:</span>
+          <span id="arrLoanTotal" class="text-2xl font-bold text-teal-600">LKR 0.00</span>
+        </div>
+      </div>
+      
+      <!-- Summary -->
+      <div class="glass rounded-xl shadow-xl p-8 bg-gradient-to-br from-teal-50 to-cyan-50">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">Arrival Summary & Commission</h3>
+        <div class="space-y-4">
+          <div class="stat-card bg-white rounded-lg p-4 border-teal-500">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600 font-medium">Sales Grand Total</span>
+              <span id="sum_sales" class="text-lg font-bold text-gray-800">LKR 0.00</span>
+            </div>
+          </div>
+          <div class="stat-card bg-white rounded-lg p-4 border-orange-500">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600 font-medium">Arrival Expenses</span>
+              <span id="sum_aexp" class="text-lg font-bold text-gray-800">LKR 0.00</span>
+            </div>
+          </div>
+          <div class="stat-card bg-white rounded-lg p-4 border-red-500">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600 font-medium">Loans (Arrival)</span>
+              <span id="sum_aloan" class="text-lg font-bold text-gray-800">LKR 0.00</span>
+            </div>
+          </div>
+          <div class="stat-card bg-white rounded-lg p-4 border-purple-500">
+            <div class="flex justify-between items-center">
+              <label for="commissionRate" class="text-gray-600 font-medium">Commission Rate (%)</label>
+              <input type="number" id="commissionRate" value="5" step="0.1" class="input-field w-32 px-4 py-2 rounded-lg text-right font-bold">
+            </div>
+          </div>
+          <div class="stat-card bg-white rounded-lg p-4 border-indigo-500">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-700 font-semibold">Commission Amount</span>
+              <span id="commissionAmount" class="text-lg font-bold text-gray-800">LKR 0.00</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-8 pt-6 border-t-2 border-teal-300 bg-white rounded-lg p-6 shadow-lg">
           <div class="flex justify-between items-center">
-            <label for="commissionRate" class="text-slate-600">Commission Rate (%)</label>
-            <input type="number" id="commissionRate" value="5" step="0.1" class="w-24 p-2 border border-slate-300 rounded-md shadow-sm">
+            <span class="text-2xl font-bold text-gray-800">Net To Owner</span>
+            <span id="netToOwner" class="text-3xl font-extrabold text-teal-600">LKR 0.00</span>
           </div>
-          <div class="flex justify-between items-center text-lg pt-2 border-t">
-            <span class="font-semibold text-slate-700">Commission Amount</span>
-            <span id="commissionAmount" class="font-bold text-slate-900">LKR 0.00</span>
-          </div>
-        </div>
-        <div class="flex justify-between items-center mt-4 pt-4 border-t border-teal-200">
-          <span class="text-xl font-bold text-teal-900">Net To Owner</span>
-          <span id="netToOwner" class="text-2xl font-extrabold text-teal-900">LKR 0.00</span>
         </div>
       </div>
       
-      <!-- START: New PDF Export Button for Arrival Report -->
-      <div class="text-right mt-6">
-          <button onclick="exportArrivalPDF()" class="bg-green-600 text-white px-6 py-3 rounded-md shadow-lg hover:bg-green-700 transition-all font-semibold text-lg">
-            Export Arrival Report (PDF)
-          </button>
+      <!-- Export -->
+      <div class="text-right">
+        <button onclick="exportArrivalPDF()" class="btn-success text-white px-8 py-4 rounded-lg font-bold text-lg shadow-xl flex items-center justify-center space-x-3 ml-auto">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          <span>Export Arrival Report (PDF)</span>
+        </button>
       </div>
-      <!-- END: New PDF Export Button for Arrival Report -->
     </div>
-
   </section>
 
 </main>
 
-<footer class="text-center p-6 text-slate-500 text-sm">
-  Built for Charu — Manikshan Boat Report System
+<footer class="text-center py-8">
+  <p class="text-white text-sm font-medium">Built for Charu — Manikshan Boat Report System © 2025</p>
 </footer>
 
 <script>
-  // Initialize default dates to today
+  // Initialize
   const today = new Date().toISOString().slice(0,10);
   document.getElementById('depDate').value = today;
   document.getElementById('arrDate').value = today;
 
-  // Show section helper
-  function showSection(idToShow){
-    document.querySelectorAll('main section').forEach(section => {
-      if(section.id === idToShow) {
-        section.classList.remove('hidden');
-      } else {
-        section.classList.add('hidden');
-      }
+  function showSection(id){
+    document.querySelectorAll('main section').forEach(s => {
+      s.classList.toggle('hidden', s.id !== id);
     });
-    // Scroll to top when changing sections
-    window.scrollTo(0, 0);
+    window.scrollTo({top: 0, behavior: 'smooth'});
   }
 
-  // Utility formatting
   function fmt(v){ return 'LKR ' + Number(v || 0).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
   function num(v){ return Number(v || 0); }
   
-  // Custom styled remove button
-  function createRemoveButton(onClickFunction) {
+  function createRemoveButton(onClick) {
       const btn = document.createElement('button');
-      btn.className = "bg-red-100 text-red-700 px-3 py-1 rounded-md text-sm hover:bg-red-200 transition-colors";
+      btn.className = "bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-100 transition-all border border-red-200";
       btn.textContent = 'Remove';
-      btn.onclick = onClickFunction;
+      btn.onclick = onClick;
       return btn;
   }
 
-  /* ----------------------
-     DEPARTURE: Loading Expenses
-     ---------------------- */
+  // DEPARTURE: Loading Expenses
   const loadingExpenses = [];
   function renderLE(){
     const tbody = document.querySelector('#leTable tbody');
@@ -429,8 +542,10 @@
     loadingExpenses.forEach((it, idx) => {
       total += num(it.amount);
       const tr = tbody.insertRow();
-      tr.innerHTML = `<td>${it.item}</td><td class="right">${fmt(it.amount)}</td>`;
-      tr.insertCell(2).appendChild(createRemoveButton(() => removeLE(idx)));
+      tr.innerHTML = `<td class="font-medium text-gray-700">${it.item}</td><td class="right font-semibold">${fmt(it.amount)}</td>`;
+      const actionCell = tr.insertCell(2);
+      actionCell.className = 'text-center';
+      actionCell.appendChild(createRemoveButton(() => removeLE(idx)));
     });
     document.getElementById('leTotal').textContent = fmt(total);
     document.getElementById('summary_le').textContent = fmt(total);
@@ -439,16 +554,15 @@
   function addLoadingExpense(){
     const item = document.getElementById('leItem').value.trim();
     const price = num(document.getElementById('lePrice').value);
-    if(!item || price <= 0) { console.warn('Enter item and positive price'); return; }
+    if(!item || price <= 0) { alert('Please enter item and positive price'); return; }
     loadingExpenses.push({item, amount: price});
-    document.getElementById('leItem').value=''; document.getElementById('lePrice').value='';
+    document.getElementById('leItem').value=''; 
+    document.getElementById('lePrice').value='';
     renderLE();
   }
   function removeLE(i){ loadingExpenses.splice(i,1); renderLE(); }
 
-  /* ----------------------
-     DEPARTURE: Diesel
-     ---------------------- */
+  // DEPARTURE: Diesel
   function updateDiesel(){
     const liters = num(document.getElementById('dieselLiters').value);
     const rate = num(document.getElementById('dieselRate').value);
@@ -460,21 +574,19 @@
   document.getElementById('dieselLiters').addEventListener('input', updateDiesel);
   document.getElementById('dieselRate').addEventListener('input', updateDiesel);
 
-  /* ----------------------
-     DEPARTURE: Repairs
-     ---------------------- */
+  // DEPARTURE: Repairs
   const repairs = [];
   function renderRepairs(){
     const tbody = document.querySelector('#repairTable tbody');
     tbody.innerHTML = '';
-    // START: Get base boat value and add it to the total
     let total = num(document.getElementById('boatValue').value);
-    // END: Get base boat value
     repairs.forEach((r, i) => {
       total += num(r.cost);
       const tr = tbody.insertRow();
-      tr.innerHTML = `<td>${r.desc}</td><td class="right">${fmt(r.cost)}</td>`;
-      tr.insertCell(2).appendChild(createRemoveButton(() => removeRepair(i)));
+      tr.innerHTML = `<td class="font-medium text-gray-700">${r.desc}</td><td class="right font-semibold">${fmt(r.cost)}</td>`;
+      const actionCell = tr.insertCell(2);
+      actionCell.className = 'text-center';
+      actionCell.appendChild(createRemoveButton(() => removeRepair(i)));
     });
     document.getElementById('repairsTotal').textContent = fmt(total);
     document.getElementById('summary_repairs').textContent = fmt(total);
@@ -483,19 +595,16 @@
   function addRepair(){
     const desc = document.getElementById('repairDesc').value.trim();
     const cost = num(document.getElementById('repairCost').value);
-    if(!desc || cost <= 0){ console.warn('Enter repair description and positive cost'); return; }
+    if(!desc || cost <= 0){ alert('Please enter repair description and positive cost'); return; }
     repairs.push({desc, cost});
-    document.getElementById('repairDesc').value=''; document.getElementById('repairCost').value=0;
+    document.getElementById('repairDesc').value=''; 
+    document.getElementById('repairCost').value=0;
     renderRepairs();
   }
   function removeRepair(i){ repairs.splice(i,1); renderRepairs(); }
-  // START: Add event listener for the new boat value input
   document.getElementById('boatValue').addEventListener('input', renderRepairs);
-  // END: Add event listener
 
-  /* ----------------------
-     DEPARTURE: Salary (NEW)
-     ---------------------- */
+  // DEPARTURE: Salary
   const salaries = [];
   function renderSalaries(){
     const tbody = document.querySelector('#salaryTable tbody');
@@ -504,8 +613,10 @@
     salaries.forEach((s, i) => {
       total += num(s.amount);
       const tr = tbody.insertRow();
-      tr.innerHTML = `<td>${s.name}</td><td class="right">${fmt(s.amount)}</td>`;
-      tr.insertCell(2).appendChild(createRemoveButton(() => removeSalary(i)));
+      tr.innerHTML = `<td class="font-medium text-gray-700">${s.name}</td><td class="right font-semibold">${fmt(s.amount)}</td>`;
+      const actionCell = tr.insertCell(2);
+      actionCell.className = 'text-center';
+      actionCell.appendChild(createRemoveButton(() => removeSalary(i)));
     });
     document.getElementById('salaryTotal').textContent = fmt(total);
     document.getElementById('summary_salary').textContent = fmt(total);
@@ -514,58 +625,62 @@
   function addSalary(){
     const name = document.getElementById('salaryName').value.trim();
     const amount = num(document.getElementById('salaryAmount').value);
-    if(!name || amount <= 0){ console.warn('Enter name and positive salary amount'); return; }
+    if(!name || amount <= 0){ alert('Please enter name and positive salary amount'); return; }
     salaries.push({name, amount});
-    document.getElementById('salaryName').value=''; document.getElementById('salaryAmount').value='';
+    document.getElementById('salaryName').value=''; 
+    document.getElementById('salaryAmount').value='';
     renderSalaries();
   }
   function removeSalary(i){ salaries.splice(i,1); renderSalaries(); }
 
-
-  /* ----------------------
-     DEPARTURE: Loans
-     ---------------------- */
+  // DEPARTURE: Loans
   const currentLoans = [];
   const previousLoans = [];
   function renderLoans(){
-    // Current
     let tbodyCur = document.querySelector('#curLoanTable tbody');
     tbodyCur.innerHTML = '';
     let curTotal = 0;
     currentLoans.forEach((l,i) => {
       curTotal += num(l.amount);
       const tr = tbodyCur.insertRow();
-      tr.innerHTML = `<td>${l.name}</td><td class="right">${fmt(l.amount)}</td>`;
-      tr.insertCell(2).appendChild(createRemoveButton(() => removeLoan('current', i)));
+      tr.innerHTML = `<td class="font-medium text-gray-700">${l.name}</td><td class="right font-semibold">${fmt(l.amount)}</td>`;
+      const actionCell = tr.insertCell(2);
+      actionCell.className = 'text-center';
+      actionCell.appendChild(createRemoveButton(() => removeLoan('current', i)));
     });
-    // Previous
+    
     let tbodyPrev = document.querySelector('#prevLoanTable tbody');
     tbodyPrev.innerHTML = '';
     let prevTotal = 0;
     previousLoans.forEach((l,i) => {
       prevTotal += num(l.amount);
       const tr = tbodyPrev.insertRow();
-      tr.innerHTML = `<td>${l.name}</td><td class="right">${fmt(l.amount)}</td>`;
-      tr.insertCell(2).appendChild(createRemoveButton(() => removeLoan('previous', i)));
+      tr.innerHTML = `<td class="font-medium text-gray-700">${l.name}</td><td class="right font-semibold">${fmt(l.amount)}</td>`;
+      const actionCell = tr.insertCell(2);
+      actionCell.className = 'text-center';
+      actionCell.appendChild(createRemoveButton(() => removeLoan('previous', i)));
     });
+    
     const loanTotal = curTotal + prevTotal;
     document.getElementById('loanTotal').textContent = fmt(loanTotal);
-    document.getElementById('summary_loans').textContent = fmt(loanTotal); // Update summary
+    document.getElementById('summary_loans').textContent = fmt(loanTotal);
     updateDepartureGrand();
   }
   function addLoan(which){
     if(which === 'current'){
       const name = document.getElementById('curLoanName').value.trim();
       const amt = num(document.getElementById('curLoanAmount').value);
-      if(!name || amt <= 0) { console.warn('Enter name and positive amount'); return; }
+      if(!name || amt <= 0) { alert('Please enter name and positive amount'); return; }
       currentLoans.push({name, amount: amt});
-      document.getElementById('curLoanName').value=''; document.getElementById('curLoanAmount').value='';
+      document.getElementById('curLoanName').value=''; 
+      document.getElementById('curLoanAmount').value='';
     } else {
       const name = document.getElementById('prevLoanName').value.trim();
       const amt = num(document.getElementById('prevLoanAmount').value);
-      if(!name || amt <= 0) { console.warn('Enter name and positive amount'); return; }
+      if(!name || amt <= 0) { alert('Please enter name and positive amount'); return; }
       previousLoans.push({name, amount: amt});
-      document.getElementById('prevLoanName').value=''; document.getElementById('prevLoanAmount').value='';
+      document.getElementById('prevLoanName').value=''; 
+      document.getElementById('prevLoanAmount').value='';
     }
     renderLoans();
   }
@@ -575,39 +690,34 @@
     renderLoans();
   }
 
-  /* ----------------------
-     DEPARTURE: Grand total
-     ---------------------- */
+  // DEPARTURE: Grand Total
   function updateDepartureGrand(){
     const leTotal = loadingExpenses.reduce((s,x)=>s+num(x.amount),0);
     const dieselTotal = num(document.getElementById('dieselLiters').value) * num(document.getElementById('dieselRate').value);
-    const repairsTotal = repairs.reduce((s,x)=>s+num(x.cost),0);
+    const repairsTotal = num(document.getElementById('boatValue').value) + repairs.reduce((s,x)=>s+num(x.cost),0);
     const salaryTotal = salaries.reduce((s,x)=>s+num(x.amount),0);
     const loanTotal = currentLoans.reduce((s,x)=>s+num(x.amount),0) + previousLoans.reduce((s,x)=>s+num(x.amount),0);
     
     const grand = leTotal + dieselTotal + repairsTotal + salaryTotal + loanTotal;
-    
     document.getElementById('departureGrand').textContent = fmt(grand);
   }
 
-  /* ----------------------
-     DEPARTURE: PDF Export
-     ---------------------- */
+  // DEPARTURE: PDF Export
   function exportDeparturePDF() {
       try {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         let y = 15;
         const margin = 15;
-        const rightMargin = 195; // Page width - margin (210 - 15)
+        const rightMargin = 195;
 
-        // Title
         doc.setFontSize(18);
+        doc.setFont(undefined, 'bold');
         doc.text("Departure Report", 105, y, { align: 'center' });
         y += 10;
 
-        // Header Info
         doc.setFontSize(12);
+        doc.setFont(undefined, 'normal');
         doc.text(`Date: ${document.getElementById('depDate').value}`, margin, y);
         doc.text(`Boat: ${document.getElementById('depBoat').value}`, 110, y);
         y += 10;
@@ -617,34 +727,29 @@
         
         const pdfNum = (v) => num(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
         
-        // START: Re-ordered PDF sections
-        
-        // --- 1. Boat Loading cost ---
         const leTotal = loadingExpenses.reduce((s,x)=>s+num(x.amount),0);
         doc.autoTable({
             startY: y,
             head: [['Boat Loading cost - Item', 'Amount (LKR)']],
             body: loadingExpenses.map(it => [it.item, pdfNum(it.amount)]),
             foot: [['Total Loading cost', { content: pdfNum(leTotal), styles: { halign: 'right' } }]],
-            headStyles: { fillColor: '#0b66c3' },
-            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
-            didDrawPage: (data) => { y = data.cursor.y; }
+            headStyles: { fillColor: [102, 126, 234] },
+            footStyles: { fillColor: [242, 248, 255], textColor: [0, 0, 0], fontStyle: 'bold' },
         });
         y = doc.autoTable.previous.finalY + 10;
 
-        // --- 2. Total Due Loans ---
         const loanTotal = currentLoans.reduce((s,x)=>s+num(x.amount),0) + previousLoans.reduce((s,x)=>s+num(x.amount),0);
         let loanBody = [];
         if (currentLoans.length > 0) {
-            loanBody.push([{ content: 'Current Loans', colSpan: 2, styles: { fontStyle: 'bold', fillColor: '#f9f9f9' } }]);
+            loanBody.push([{ content: 'Current Loans', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [249, 249, 249] } }]);
             currentLoans.forEach(l => loanBody.push([l.name, pdfNum(l.amount)]));
         }
         if (previousLoans.length > 0) {
-            loanBody.push([{ content: 'Previous Loans', colSpan: 2, styles: { fontStyle: 'bold', fillColor: '#f9f9f9' } }]);
+            loanBody.push([{ content: 'Previous Loans', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [249, 249, 249] } }]);
             previousLoans.forEach(l => loanBody.push([l.name, pdfNum(l.amount)]));
         }
         if (loanBody.length === 0) {
-            loanBody.push([[{content: 'No loans reported.', colSpan: 2, styles: { halign: 'center' }}]]);
+            loanBody.push([{ content: 'No loans reported.', colSpan: 2, styles: { halign: 'center' } }]);
         }
         
         doc.autoTable({
@@ -652,20 +757,18 @@
             head: [['Total Due Loans - Name', 'Amount (LKR)']],
             body: loanBody,
             foot: [['Total Loans', { content: pdfNum(loanTotal), styles: { halign: 'right' } }]],
-            headStyles: { fillColor: '#0b66c3' },
-            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
-            didDrawPage: (data) => { y = data.cursor.y; }
+            headStyles: { fillColor: [102, 126, 234] },
+            footStyles: { fillColor: [242, 248, 255], textColor: [0, 0, 0], fontStyle: 'bold' },
         });
         y = doc.autoTable.previous.finalY + 10;
         
-        // --- 3. Current Value of the Boat ---
         const boatValue = num(document.getElementById('boatValue').value);
         const repairsTotal = boatValue + repairs.reduce((s,x)=>s+num(x.cost),0);
         let repairBody = [
             [{ content: 'Current Boat Value', styles: { fontStyle: 'bold' } }, { content: pdfNum(boatValue), styles: { halign: 'right' } }]
         ];
         if (repairs.length > 0) {
-             repairBody.push([{ content: 'Additional Repairs', colSpan: 2, styles: { fontStyle: 'bold', fillColor: '#f9f9f9' } }]);
+             repairBody.push([{ content: 'Additional Repairs', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [249, 249, 249] } }]);
              repairs.forEach(r => repairBody.push([r.desc, pdfNum(r.cost)]));
         }
 
@@ -674,13 +777,11 @@
             head: [['Current Value of the Boat', 'Amount (LKR)']],
             body: repairBody,
             foot: [['Total Boat Value & Repairs', { content: pdfNum(repairsTotal), styles: { halign: 'right' } }]],
-            headStyles: { fillColor: '#0b66c3' },
-            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
-            didDrawPage: (data) => { y = data.cursor.y; }
+            headStyles: { fillColor: [102, 126, 234] },
+            footStyles: { fillColor: [242, 248, 255], textColor: [0, 0, 0], fontStyle: 'bold' },
         });
         y = doc.autoTable.previous.finalY + 10;
 
-        // --- 4. Diesel ---
         const dieselLiters = num(document.getElementById('dieselLiters').value);
         const dieselRate = num(document.getElementById('dieselRate').value);
         const dieselTotal = dieselLiters * dieselRate;
@@ -692,29 +793,22 @@
                 ['Rate (LKR / litre)', pdfNum(dieselRate)]
             ],
             foot: [['Total Diesel', { content: pdfNum(dieselTotal), styles: { halign: 'right' } }]],
-            headStyles: { fillColor: '#0b66c3' },
-            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
-            didDrawPage: (data) => { y = data.cursor.y; }
+            headStyles: { fillColor: [102, 126, 234] },
+            footStyles: { fillColor: [242, 248, 255], textColor: [0, 0, 0], fontStyle: 'bold' },
         });
         y = doc.autoTable.previous.finalY + 10;
 
-        // --- 5. Salary ---
         const salaryTotal = salaries.reduce((s,x)=>s+num(x.amount),0);
         doc.autoTable({
             startY: y,
             head: [['Salary - Name', 'Amount (LKR)']],
-            body: salaries.map(s => [s.name, pdfNum(s.amount)]),
+            body: salaries.length > 0 ? salaries.map(s => [s.name, pdfNum(s.amount)]) : [['No salaries recorded', '']],
             foot: [['Total Salary', { content: pdfNum(salaryTotal), styles: { halign: 'right' } }]],
-            headStyles: { fillColor: '#0b66c3' },
-            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
-            didDrawPage: (data) => { y = data.cursor.y; }
+            headStyles: { fillColor: [102, 126, 234] },
+            footStyles: { fillColor: [242, 248, 255], textColor: [0, 0, 0], fontStyle: 'bold' },
         });
         y = doc.autoTable.previous.finalY + 10;
-        
-        // --- END: Re-ordered PDF sections ---
 
-
-        // --- Grand Total Summary Table ---
         if (y > 270) {
             doc.addPage();
             y = 15;
@@ -735,34 +829,140 @@
                 { content: 'Total Amount (LKR)', styles: { fontStyle: 'bold' } },
                 { content: pdfNum(grandTotal), styles: { halign: 'right', fontStyle: 'bold' } }
             ]],
-            headStyles: { fillColor: '#4338ca' }, // Darker indigo
-            footStyles: { fillColor: '#e0e7ff', textColor: '#000', fontStyle: 'bold', fontSize: 12 },
+            headStyles: { fillColor: [67, 56, 202] },
+            footStyles: { fillColor: [224, 231, 255], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 12 },
             theme: 'grid'
         });
 
         doc.save(`Departure_Report_${document.getElementById('depDate').value}_${document.getElementById('depBoat').value || 'NoBoat'}.pdf`);
     } catch(e) {
         console.error("Error generating PDF:", e);
-        console.warn("Could not generate PDF. Check console for errors.");
+        alert("Could not generate PDF. Check console for errors.");
     }
   }
 
-  // START: New PDF Export function for Arrival Report
+  // ARRIVAL: Sales
+  const sales = [];
+  function renderSales(){
+    const tbody = document.querySelector('#saleTable tbody'); 
+    tbody.innerHTML = '';
+    let grand = 0;
+    sales.forEach((s,i) => {
+      const total = num(s.kg) * num(s.rate);
+      grand += total;
+      const tr = tbody.insertRow();
+      tr.innerHTML = `<td class="font-medium text-gray-700">${s.variety}</td>
+        <td class="right font-semibold">${Number(s.kg).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+        <td class="right font-semibold">${fmt(s.rate)}</td>
+        <td class="right font-semibold">${fmt(total)}</td>`;
+      const actionCell = tr.insertCell(4);
+      actionCell.className = 'text-center';
+      actionCell.appendChild(createRemoveButton(() => removeSale(i)));
+    });
+    document.getElementById('salesGrand').textContent = fmt(grand);
+    document.getElementById('sum_sales').textContent = fmt(grand);
+    updateArrivalSummary();
+  }
+  function addSale(){
+    const variety = document.getElementById('saleVariety').value.trim();
+    const kg = num(document.getElementById('saleKg').value);
+    const rate = num(document.getElementById('saleRate').value);
+    if(!variety || kg <= 0 || rate <= 0){ alert('Please enter variety, positive KG and positive rate'); return; }
+    sales.push({variety, kg, rate});
+    document.getElementById('saleVariety').value=''; 
+    document.getElementById('saleKg').value=''; 
+    document.getElementById('saleRate').value='';
+    renderSales();
+  }
+  function removeSale(i){ sales.splice(i,1); renderSales(); }
+
+  // ARRIVAL: Expenses
+  const arrivalExpenses = [];
+  function renderAE(){
+    const tbody = document.querySelector('#aeTable tbody'); 
+    tbody.innerHTML = '';
+    let total = 0;
+    arrivalExpenses.forEach((e,i)=>{
+      total += num(e.amount);
+      const tr = tbody.insertRow();
+      tr.innerHTML = `<td class="font-medium text-gray-700">${e.item}</td><td class="right font-semibold">${fmt(e.amount)}</td>`;
+      const actionCell = tr.insertCell(2);
+      actionCell.className = 'text-center';
+      actionCell.appendChild(createRemoveButton(() => removeAE(i)));
+    });
+    document.getElementById('aeTotal').textContent = fmt(total);
+    document.getElementById('sum_aexp').textContent = fmt(total);
+    updateArrivalSummary();
+  }
+  function addArrivalExpense(){
+    const item = document.getElementById('aeItem').value.trim();
+    const price = num(document.getElementById('aePrice').value);
+    if(!item || price <= 0){ alert('Please enter item and positive amount'); return; }
+    arrivalExpenses.push({item, amount: price});
+    document.getElementById('aeItem').value=''; 
+    document.getElementById('aePrice').value='';
+    renderAE();
+  }
+  function removeAE(i){ arrivalExpenses.splice(i,1); renderAE(); }
+
+  // ARRIVAL: Loans
+  const arrivalLoans = [];
+  function renderArrivalLoans(){
+    const tbody = document.querySelector('#arrLoanTable tbody'); 
+    tbody.innerHTML = '';
+    let total = 0;
+    arrivalLoans.forEach((l,i)=>{
+      total += num(l.amount);
+      const tr = tbody.insertRow();
+      tr.innerHTML = `<td class="font-medium text-gray-700">${l.name}</td><td class="right font-semibold">${fmt(l.amount)}</td>`;
+      const actionCell = tr.insertCell(2);
+      actionCell.className = 'text-center';
+      actionCell.appendChild(createRemoveButton(() => removeArrivalLoan(i)));
+    });
+    document.getElementById('arrLoanTotal').textContent = fmt(total);
+    document.getElementById('sum_aloan').textContent = fmt(total);
+    updateArrivalSummary();
+  }
+  function addArrivalLoan(){
+    const name = document.getElementById('arrLoanName').value.trim();
+    const amt = num(document.getElementById('arrLoanAmt').value);
+    if(!name || amt <= 0){ alert('Please enter name and positive amount'); return; }
+    arrivalLoans.push({name, amount: amt}); 
+    document.getElementById('arrLoanName').value=''; 
+    document.getElementById('arrLoanAmt').value='';
+    renderArrivalLoans();
+  }
+  function removeArrivalLoan(i){ arrivalLoans.splice(i,1); renderArrivalLoans(); }
+
+  // ARRIVAL: Summary
+  function updateArrivalSummary(){
+    const salesGrand = sales.reduce((s,x)=> s + (num(x.kg) * num(x.rate)), 0);
+    const aexp = arrivalExpenses.reduce((s,x)=> s + num(x.amount), 0);
+    const aloan = arrivalLoans.reduce((s,x)=> s + num(x.amount), 0);
+    const cr = num(document.getElementById('commissionRate').value) / 100;
+    const commission = salesGrand * cr;
+    const net = salesGrand - aexp - aloan - commission;
+    document.getElementById('commissionAmount').textContent = fmt(commission);
+    document.getElementById('netToOwner').textContent = fmt(net);
+  }
+  document.getElementById('commissionRate').addEventListener('input', updateArrivalSummary);
+
+  // ARRIVAL: PDF Export
   function exportArrivalPDF() {
       try {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         let y = 15;
         const margin = 15;
-        const rightMargin = 195; // Page width - margin (210 - 15)
+        const rightMargin = 195;
 
-        // Title
         doc.setFontSize(18);
+        doc.setFont(undefined, 'bold');
         doc.text("Arrival Report", 105, y, { align: 'center' });
         y += 10;
 
-        // Header Info
         doc.setFontSize(12);
+        doc.setFont(undefined, 'normal');
         doc.text(`Date: ${document.getElementById('arrDate').value}`, margin, y);
         doc.text(`Boat: ${document.getElementById('arrBoat').value}`, 110, y);
         y += 10;
@@ -773,51 +973,44 @@
         const pdfNum = (v) => num(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
         const pdfFmt = (v) => fmt(v);
 
-        // --- 1. Sales ---
         const salesGrand = sales.reduce((s,x)=> s + (num(x.kg) * num(x.rate)), 0);
         doc.autoTable({
             startY: y,
-            head: [['Variety', 'KG', 'Rate / KG (LKR)', 'Total (LKR)']],
-            body: sales.map(s => [
+            head: [['Variety', 'KG', 'Rate/KG (LKR)', 'Total (LKR)']],
+            body: sales.length > 0 ? sales.map(s => [
                 s.variety, 
                 pdfNum(s.kg), 
                 pdfNum(s.rate), 
                 pdfNum(num(s.kg) * num(s.rate))
-            ]),
+            ]) : [['No sales recorded', '', '', '']],
             foot: [['Total Sales', '', '', { content: pdfNum(salesGrand), styles: { halign: 'right' } }]],
-            headStyles: { fillColor: '#0d9488' }, // Teal
-            footStyles: { fillColor: '#f0fdfa', textColor: '#000', fontStyle: 'bold' },
-            didDrawPage: (data) => { y = data.cursor.y; }
+            headStyles: { fillColor: [20, 184, 166] },
+            footStyles: { fillColor: [240, 253, 250], textColor: [0, 0, 0], fontStyle: 'bold' },
         });
         y = doc.autoTable.previous.finalY + 10;
         
-        // --- 2. Arrival Expenses ---
         const aexpTotal = arrivalExpenses.reduce((s,x)=> s + num(x.amount), 0);
         doc.autoTable({
             startY: y,
             head: [['Arrival Expenses - Item', 'Amount (LKR)']],
-            body: arrivalExpenses.map(e => [e.item, pdfNum(e.amount)]),
+            body: arrivalExpenses.length > 0 ? arrivalExpenses.map(e => [e.item, pdfNum(e.amount)]) : [['No expenses recorded', '']],
             foot: [['Total Arrival Expenses', { content: pdfNum(aexpTotal), styles: { halign: 'right' } }]],
-            headStyles: { fillColor: '#0d9488' }, // Teal
-            footStyles: { fillColor: '#f0fdfa', textColor: '#000', fontStyle: 'bold' },
-            didDrawPage: (data) => { y = data.cursor.y; }
+            headStyles: { fillColor: [20, 184, 166] },
+            footStyles: { fillColor: [240, 253, 250], textColor: [0, 0, 0], fontStyle: 'bold' },
         });
         y = doc.autoTable.previous.finalY + 10;
 
-        // --- 3. Arrival Loans ---
         const aloanTotal = arrivalLoans.reduce((s,x)=> s + num(x.amount), 0);
         doc.autoTable({
             startY: y,
             head: [['Arrival Loans - Name', 'Amount (LKR)']],
-            body: arrivalLoans.map(l => [l.name, pdfNum(l.amount)]),
+            body: arrivalLoans.length > 0 ? arrivalLoans.map(l => [l.name, pdfNum(l.amount)]) : [['No loans recorded', '']],
             foot: [['Total Arrival Loans', { content: pdfNum(aloanTotal), styles: { halign: 'right' } }]],
-            headStyles: { fillColor: '#0d9488' }, // Teal
-            footStyles: { fillColor: '#f0fdfa', textColor: '#000', fontStyle: 'bold' },
-            didDrawPage: (data) => { y = data.cursor.y; }
+            headStyles: { fillColor: [20, 184, 166] },
+            footStyles: { fillColor: [240, 253, 250], textColor: [0, 0, 0], fontStyle: 'bold' },
         });
         y = doc.autoTable.previous.finalY + 10;
 
-        // --- 4. Summary & Commission ---
         if (y > 270) {
             doc.addPage();
             y = 15;
@@ -841,139 +1034,19 @@
                 { content: 'Net To Owner', styles: { fontStyle: 'bold' } },
                 { content: pdfFmt(netToOwner), styles: { halign: 'right', fontStyle: 'bold' } }
             ]],
-            headStyles: { fillColor: '#134e4a' }, // Darker Teal
-            footStyles: { fillColor: '#ccfbf1', textColor: '#000', fontStyle: 'bold', fontSize: 12 },
+            headStyles: { fillColor: [15, 118, 110] },
+            footStyles: { fillColor: [204, 251, 241], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 12 },
             theme: 'grid'
         });
 
         doc.save(`Arrival_Report_${document.getElementById('arrDate').value}_${document.getElementById('arrBoat').value || 'NoBoat'}.pdf`);
     } catch(e) {
         console.error("Error generating PDF:", e);
-        console.warn("Could not generate PDF. Check console for errors.");
+        alert("Could not generate PDF. Check console for errors.");
     }
   }
-  // END: New PDF Export function for Arrival Report
 
-
-  /* ======================
-     ARRIVAL: FULL SYSTEM
-     ====================== */
-  const sales = [];
-  function renderSales(){
-    const tbody = document.querySelector('#saleTable tbody'); tbody.innerHTML = '';
-    let grand = 0;
-    sales.forEach((s,i) => {
-      const total = num(s.kg) * num(s.rate);
-      grand += total;
-      const tr = tbody.insertRow();
-      tr.innerHTML = `<td>${s.variety}</td>
-        <td class="right">${Number(s.kg).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-        <td class="right">${fmt(s.rate)}</td>
-        <td class="right">${fmt(total)}</td>`;
-      tr.insertCell(4).appendChild(createRemoveButton(() => removeSale(i)));
-    });
-    document.getElementById('salesGrand').textContent = fmt(grand);
-    document.getElementById('sum_sales').textContent = fmt(grand);
-    updateArrivalSummary();
-  }
-  function addSale(){
-    const variety = document.getElementById('saleVariety').value.trim();
-    const kg = num(document.getElementById('saleKg').value);
-    const rate = num(document.getElementById('saleRate').value);
-    if(!variety || kg <= 0 || rate <= 0){ console.warn('Enter variety, positive KG and positive rate'); return; }
-    sales.push({variety, kg, rate});
-    document.getElementById('saleVariety').value=''; document.getElementById('saleKg').value=''; document.getElementById('saleRate').value='';
-    renderSales();
-  }
-  function removeSale(i){ sales.splice(i,1); renderSales(); }
-
-  // Arrival expenses
-  const arrivalExpenses = [];
-  function renderAE(){
-    const tbody = document.querySelector('#aeTable tbody'); tbody.innerHTML = '';
-    let total = 0;
-    arrivalExpenses.forEach((e,i)=>{
-      total += num(e.amount);
-      const tr = tbody.insertRow();
-      tr.innerHTML = `<td>${e.item}</td><td class="right">${fmt(e.amount)}</td>`;
-      tr.insertCell(2).appendChild(createRemoveButton(() => removeAE(i)));
-    });
-    document.getElementById('aeTotal').textContent = fmt(total);
-    document.getElementById('sum_aexp').textContent = fmt(total);
-    updateArrivalSummary();
-  }
-  function addArrivalExpense(){
-    const item = document.getElementById('aeItem').value.trim();
-    const price = num(document.getElementById('aePrice').value);
-    if(!item || price <= 0){ console.warn('Enter item and positive amount'); return; }
-    arrivalExpenses.push({item, amount: price});
-    document.getElementById('aeItem').value=''; document.getElementById('aePrice').value='';
-    renderAE();
-  }
-  function removeAE(i){ arrivalExpenses.splice(i,1); renderAE(); }
-
-  // Arrival loans
-  const arrivalLoans = [];
-  function renderArrivalLoans(){
-    const tbody = document.querySelector('#arrLoanTable tbody'); tbody.innerHTML = '';
-    let total = 0;
-    arrivalLoans.forEach((l,i)=>{
-      total += num(l.amount);
-      const tr = tbody.insertRow();
-      tr.innerHTML = `<td>${l.name}</td><td class="right">${fmt(l.amount)}</td>`;
-      tr.insertCell(2).appendChild(createRemoveButton(() => removeArrivalLoan(i)));
-    });
-    document.getElementById('arrLoanTotal').textContent = fmt(total);
-    document.getElementById('sum_aloan').textContent = fmt(total);
-    updateArrivalSummary();
-  }
-  function addArrivalLoan(){
-    const name = document.getElementById('arrLoanName').value.trim();
-    const amt = num(document.getElementById('arrLoanAmt').value);
-    if(!name || amt <= 0){ console.warn('Enter name and positive amount'); return; }
-    // Note: The original file had a bug here, 'amount' was not defined. Fixed to 'amt'.
-    arrivalLoans.push({name, amount: amt}); 
-    document.getElementById('arrLoanName').value=''; document.getElementById('arrLoanAmt').value='';
-    renderArrivalLoans();
-  }
-  function removeArrivalLoan(i){ arrivalLoans.splice(i,1); renderArrivalLoans(); }
-
-  // Commission & Net calculation
-  function updateArrivalSummary(){
-    const salesGrand = sales.reduce((s,x)=> s + (num(x.kg) * num(x.rate)), 0);
-    const aexp = arrivalExpenses.reduce((s,x)=> s + num(x.amount), 0);
-    const aloan = arrivalLoans.reduce((s,x)=> s + num(x.amount), 0);
-    const cr = num(document.getElementById('commissionRate').value) / 100;
-    const commission = salesGrand * cr;
-    const net = salesGrand - aexp - aloan - commission;
-    document.getElementById('commissionAmount').textContent = fmt(commission);
-    document.getElementById('netToOwner').textContent = fmt(net);
-  }
-  document.getElementById('commissionRate').addEventListener('input', updateArrivalSummary);
-
-  /* ----------------------
-     Wire up event handlers
-     ---------------------- */
-  // Make functions globally accessible for onclick attributes
-  window.showSection = showSection;
-  window.addLoadingExpense = addLoadingExpense;
-  window.removeLE = removeLE;
-  window.addRepair = addRepair;
-  window.removeRepair = removeRepair;
-  window.addSalary = addSalary;
-  window.removeSalary = removeSalary;
-  window.addLoan = addLoan;
-  window.removeLoan = removeLoan;
-  window.exportDeparturePDF = exportDeparturePDF;
-  window.addSale = addSale;
-  window.removeSale = removeSale;
-  window.addArrivalExpense = addArrivalExpense;
-  window.removeAE = removeAE;
-  window.addArrivalLoan = addArrivalLoan;
-  window.removeArrivalLoan = removeArrivalLoan;
-  window.exportArrivalPDF = exportArrivalPDF; // <-- Add new function to window
-
-  // Basic init
+  // Initialize
   renderLE();
   updateDiesel();
   renderRepairs();
@@ -984,7 +1057,7 @@
   renderArrivalLoans();
   updateArrivalSummary();
 
-  // Keyboard-friendly quick-add using Enter
+  // Keyboard shortcuts
   document.querySelectorAll('input').forEach(i=>{
     i.addEventListener('keydown', (e)=>{
       if(e.key === 'Enter'){
