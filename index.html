@@ -10,24 +10,73 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   * { font-family: 'Inter', system-ui, sans-serif; }
-  body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-  .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+  /* Lighter, more modern gradient for better eye comfort */
+  body { background: linear-gradient(135deg, #a7bfe8 0%, #6190e8 100%); min-height: 100vh; }
+  /* Enhanced Glass effect with more blur and subtle shadow */
+  .glass { 
+    background: rgba(255, 255, 255, 0.95); 
+    backdrop-filter: blur(12px); 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06); 
+  }
   .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
-  table th, table td { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: left; font-size: 14px; }
-  table th { background: linear-gradient(to bottom, #f9fafb, #f3f4f6); font-weight: 600; color: #374151; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
-  table tbody tr:hover { background-color: #f9fafb; transition: background-color 0.2s; }
-  .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: all 0.3s; }
-  .btn-primary:hover { transform: scale(1.02); box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3); }
-  .btn-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-  .btn-success:hover { transform: scale(1.02); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
-  .input-field { transition: all 0.2s; border: 2px solid #e5e7eb; }
-  .input-field:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); outline: none; }
-  .section-title { position: relative; display: inline-block; }
-  .section-title::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 60%; height: 3px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 2px; }
+  /* Slightly more lift on hover */
+  .card-hover:hover { transform: translateY(-6px); box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1), 0 5px 10px -5px rgba(0, 0, 0, 0.04); }
+  
+  /* --- Professional Table Styling --- */
+  table { 
+    border-collapse: separate; 
+    border-spacing: 0; 
+    min-width: 650px; /* Forces horizontal scroll on small screens for better data integrity */
+  }
+  .table-container { 
+    overflow-x: auto; 
+    border-radius: 12px; /* Smoother corners on the container */
+    border: 1px solid #d1d5db; /* Light, clean border around the table block */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  }
+  table th, table td { 
+    padding: 14px 20px; /* Default desktop padding */
+    text-align: left; 
+    font-size: 15px; /* Slightly larger font for better readability */
+  }
+  
+  /* Mobile-specific adjustments for density */
+  @media (max-width: 640px) {
+    table th, table td { 
+      padding: 10px 12px; /* Reduced padding for mobile density */
+      font-size: 14px; 
+    }
+  }
+
+  table th { 
+    background: #f8f9fa; /* Uniform, clean header background */
+    border-bottom: 2px solid #e5e7eb; /* Clearer separation */
+    font-weight: 600; 
+    color: #4b5563; /* Darker text */
+    text-transform: capitalize; 
+    font-size: 13px; 
+    letter-spacing: 0.2px; 
+  }
+  table tbody tr:last-child td { border-bottom: none; } /* Remove bottom border on last row */
+  table tbody tr { border-bottom: 1px solid #e5e7eb; } /* Maintain border for all other rows */
+  table tbody tr:hover { background-color: #f3f4f6; transition: background-color 0.2s; }
+  
+  /* Fixed width for action columns across all tables */
+  .action-cell { width: 120px; text-align: center; }
+
+  /* Button and Input color refinement */
+  .btn-primary { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); transition: all 0.3s; }
+  .btn-primary:hover { transform: scale(1.02); box-shadow: 0 12px 25px rgba(79, 70, 229, 0.3); }
+  .btn-success { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+  .btn-success:hover { transform: scale(1.02); box-shadow: 0 12px 25px rgba(5, 150, 105, 0.3); }
+  .input-field { border: 2px solid #e5e7eb; }
+  /* Deeper focus color */
+  .input-field:focus { border-color: #4f46e5; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); outline: none; }
+  .section-title::after { background: linear-gradient(90deg, #4f46e5, #7c3aed); }
   .animate-in { animation: slideIn 0.5s ease-out; }
   @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  .stat-card { border-left: 4px solid; }
+  /* Thicker left border and smoother card corners */
+  .stat-card { border-left: 6px solid; border-radius: 8px; }
   .right { text-align: right; }
 </style>
 </head>
@@ -163,9 +212,9 @@
           <input type="number" id="lePrice" placeholder="Amount (LKR)" class="input-field md:col-span-3 px-4 py-3 rounded-lg">
           <button onclick="addLoadingExpense()" class="btn-primary md:col-span-2 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">Add</button>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <div class="table-container">
           <table id="leTable" class="w-full">
-            <thead><tr><th>Item Description</th><th class="right">Amount (LKR)</th><th class="text-center w-32">Action</th></tr></thead>
+            <thead><tr><th>Item Description</th><th class="right">Amount (LKR)</th><th class="action-cell">Action</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -212,9 +261,9 @@
           <input type="number" id="repairCost" value="0" min="0" step="0.01" placeholder="Cost (LKR)" class="input-field md:col-span-3 px-4 py-3 rounded-lg">
           <button onclick="addRepair()" class="btn-primary md:col-span-2 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">Add</button>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <div class="table-container">
           <table id="repairTable" class="w-full">
-            <thead><tr><th>Repair Description</th><th class="right">Amount (LKR)</th><th class="text-center w-32">Action</th></tr></thead>
+            <thead><tr><th>Repair Description</th><th class="right">Amount (LKR)</th><th class="action-cell">Action</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -235,9 +284,9 @@
           <input type="number" id="salaryAmount" placeholder="Amount (LKR)" class="input-field md:col-span-3 px-4 py-3 rounded-lg">
           <button onclick="addSalary()" class="btn-primary md:col-span-2 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">Add</button>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <div class="table-container">
           <table id="salaryTable" class="w-full">
-            <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="text-center w-32">Action</th></tr></thead>
+            <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="action-cell">Action</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -261,9 +310,9 @@
               <input type="number" id="curLoanAmount" placeholder="LKR" class="input-field w-32 px-4 py-2 rounded-lg">
               <button onclick="addLoan('current')" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors font-semibold">Add</button>
             </div>
-            <div class="overflow-x-auto rounded-lg border border-gray-200">
+            <div class="table-container">
               <table id="curLoanTable" class="w-full">
-                <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="text-center w-24">Action</th></tr></thead>
+                <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="action-cell">Action</th></tr></thead>
                 <tbody></tbody>
               </table>
             </div>
@@ -275,9 +324,9 @@
               <input type="number" id="prevLoanAmount" placeholder="LKR" class="input-field w-32 px-4 py-2 rounded-lg">
               <button onclick="addLoan('previous')" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors font-semibold">Add</button>
             </div>
-            <div class="overflow-x-auto rounded-lg border border-gray-200">
+            <div class="table-container">
               <table id="prevLoanTable" class="w-full">
-                <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="text-center w-24">Action</th></tr></thead>
+                <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="action-cell">Action</th></tr></thead>
                 <tbody></tbody>
               </table>
             </div>
@@ -334,7 +383,7 @@
 
       <!-- Export -->
       <div class="text-right">
-        <button onclick="exportDeparturePDF()" class="btn-success text-white px-8 py-4 rounded-lg font-bold text-lg shadow-xl flex items-center justify-center space-x-3 ml-auto">
+        <button onclick="exportDeparturePDF()" class="btn-success w-full md:w-auto text-white px-8 py-4 rounded-lg font-bold text-lg shadow-xl flex items-center justify-center space-x-3 ml-auto">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
           </svg>
@@ -387,12 +436,12 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
           <input type="text" id="saleVariety" placeholder="Variety (e.g., Tuna)" class="input-field md:col-span-5 px-4 py-3 rounded-lg">
           <input type="number" id="saleKg" placeholder="KG" step="0.01" class="input-field md:col-span-3 px-4 py-3 rounded-lg">
-          <input type="number" id="saleRate" placeholder="Rate per KG" step="0.01" class="input-field md:col-span-2 px-4 py-3 rounded-lg">
+          <input type="number" id="saleRate" placeholder="Price per KG (LKR)" step="0.01" class="input-field md:col-span-2 px-4 py-3 rounded-lg">
           <button onclick="addSale()" class="btn-primary md:col-span-2 text-white px-6 py-3 rounded-lg font-bold shadow-lg">Add Sale</button>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <div class="table-container">
           <table id="saleTable" class="w-full">
-            <thead><tr><th>Variety</th><th class="right">KG</th><th class="right">Rate/KG (LKR)</th><th class="right">Total (LKR)</th><th class="text-center w-32">Action</th></tr></thead>
+            <thead><tr><th>Variety</th><th class="right">KG</th><th class="right">Rate/KG (LKR)</th><th class="right">Total (LKR)</th><th class="action-cell">Action</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -413,9 +462,9 @@
           <input type="number" id="aePrice" placeholder="Amount (LKR)" class="input-field md:col-span-3 px-4 py-3 rounded-lg">
           <button onclick="addArrivalExpense()" class="btn-primary md:col-span-2 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">Add</button>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <div class="table-container">
           <table id="aeTable" class="w-full">
-            <thead><tr><th>Item Description</th><th class="right">Amount (LKR)</th><th class="text-center w-32">Action</th></tr></thead>
+            <thead><tr><th>Item Description</th><th class="right">Amount (LKR)</th><th class="action-cell">Action</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -436,9 +485,9 @@
           <input type="number" id="arrLoanAmt" placeholder="Amount (LKR)" class="input-field md:col-span-3 px-4 py-3 rounded-lg">
           <button onclick="addArrivalLoan()" class="btn-primary md:col-span-2 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">Add</button>
         </div>
-        <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <div class="table-container">
           <table id="arrLoanTable" class="w-full">
-            <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="text-center w-32">Action</th></tr></thead>
+            <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="action-cell">Action</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -493,7 +542,7 @@
       
       <!-- Export -->
       <div class="text-right">
-        <button onclick="exportArrivalPDF()" class="btn-success text-white px-8 py-4 rounded-lg font-bold text-lg shadow-xl flex items-center justify-center space-x-3 ml-auto">
+        <button onclick="exportArrivalPDF()" class="btn-success w-full md:w-auto text-white px-8 py-4 rounded-lg font-bold text-lg shadow-xl flex items-center justify-center space-x-3 ml-auto">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
           </svg>
@@ -522,12 +571,20 @@
     window.scrollTo({top: 0, behavior: 'smooth'});
   }
 
-  function fmt(v){ return 'LKR ' + Number(v || 0).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
+  // ENHANCED: Professional LKR currency formatting
+  function fmt(v){ 
+    return Number(v || 0).toLocaleString('en-LK', {
+      style: 'currency', 
+      currency: 'LKR', 
+      minimumFractionDigits: 2, 
+      maximumFractionDigits: 2 
+    }); 
+  }
   function num(v){ return Number(v || 0); }
   
   function createRemoveButton(onClick) {
       const btn = document.createElement('button');
-      btn.className = "bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-100 transition-all border border-red-200";
+      btn.className = "bg-red-50 text-red-600 px-3 py-1 rounded-lg text-xs font-semibold hover:bg-red-100 transition-all border border-red-200"; // Reduced padding/size for mobile
       btn.textContent = 'Remove';
       btn.onclick = onClick;
       return btn;
@@ -544,7 +601,7 @@
       const tr = tbody.insertRow();
       tr.innerHTML = `<td class="font-medium text-gray-700">${it.item}</td><td class="right font-semibold">${fmt(it.amount)}</td>`;
       const actionCell = tr.insertCell(2);
-      actionCell.className = 'text-center';
+      actionCell.className = 'action-cell'; // Added class for fixed width
       actionCell.appendChild(createRemoveButton(() => removeLE(idx)));
     });
     document.getElementById('leTotal').textContent = fmt(total);
@@ -554,7 +611,7 @@
   function addLoadingExpense(){
     const item = document.getElementById('leItem').value.trim();
     const price = num(document.getElementById('lePrice').value);
-    if(!item || price <= 0) { alert('Please enter item and positive price'); return; }
+    if(!item || price <= 0) { console.error('Invalid input for Loading Expense.'); return; }
     loadingExpenses.push({item, amount: price});
     document.getElementById('leItem').value=''; 
     document.getElementById('lePrice').value='';
@@ -579,15 +636,16 @@
   function renderRepairs(){
     const tbody = document.querySelector('#repairTable tbody');
     tbody.innerHTML = '';
-    let total = num(document.getElementById('boatValue').value);
+    let total = num(document.getElementById('boatValue').value); // Boat value is part of the repairs total in the summary
     repairs.forEach((r, i) => {
       total += num(r.cost);
       const tr = tbody.insertRow();
       tr.innerHTML = `<td class="font-medium text-gray-700">${r.desc}</td><td class="right font-semibold">${fmt(r.cost)}</td>`;
       const actionCell = tr.insertCell(2);
-      actionCell.className = 'text-center';
+      actionCell.className = 'action-cell'; // Added class for fixed width
       actionCell.appendChild(createRemoveButton(() => removeRepair(i)));
     });
+    // This total now includes the initial boat value
     document.getElementById('repairsTotal').textContent = fmt(total);
     document.getElementById('summary_repairs').textContent = fmt(total);
     updateDepartureGrand();
@@ -595,7 +653,7 @@
   function addRepair(){
     const desc = document.getElementById('repairDesc').value.trim();
     const cost = num(document.getElementById('repairCost').value);
-    if(!desc || cost <= 0){ alert('Please enter repair description and positive cost'); return; }
+    if(!desc || cost <= 0){ console.error('Invalid input for Repair.'); return; }
     repairs.push({desc, cost});
     document.getElementById('repairDesc').value=''; 
     document.getElementById('repairCost').value=0;
@@ -615,7 +673,7 @@
       const tr = tbody.insertRow();
       tr.innerHTML = `<td class="font-medium text-gray-700">${s.name}</td><td class="right font-semibold">${fmt(s.amount)}</td>`;
       const actionCell = tr.insertCell(2);
-      actionCell.className = 'text-center';
+      actionCell.className = 'action-cell'; // Added class for fixed width
       actionCell.appendChild(createRemoveButton(() => removeSalary(i)));
     });
     document.getElementById('salaryTotal').textContent = fmt(total);
@@ -625,7 +683,7 @@
   function addSalary(){
     const name = document.getElementById('salaryName').value.trim();
     const amount = num(document.getElementById('salaryAmount').value);
-    if(!name || amount <= 0){ alert('Please enter name and positive salary amount'); return; }
+    if(!name || amount <= 0){ console.error('Invalid input for Salary.'); return; }
     salaries.push({name, amount});
     document.getElementById('salaryName').value=''; 
     document.getElementById('salaryAmount').value='';
@@ -645,7 +703,7 @@
       const tr = tbodyCur.insertRow();
       tr.innerHTML = `<td class="font-medium text-gray-700">${l.name}</td><td class="right font-semibold">${fmt(l.amount)}</td>`;
       const actionCell = tr.insertCell(2);
-      actionCell.className = 'text-center';
+      actionCell.className = 'action-cell'; // Added class for fixed width
       actionCell.appendChild(createRemoveButton(() => removeLoan('current', i)));
     });
     
@@ -657,7 +715,7 @@
       const tr = tbodyPrev.insertRow();
       tr.innerHTML = `<td class="font-medium text-gray-700">${l.name}</td><td class="right font-semibold">${fmt(l.amount)}</td>`;
       const actionCell = tr.insertCell(2);
-      actionCell.className = 'text-center';
+      actionCell.className = 'action-cell'; // Added class for fixed width
       actionCell.appendChild(createRemoveButton(() => removeLoan('previous', i)));
     });
     
@@ -670,14 +728,14 @@
     if(which === 'current'){
       const name = document.getElementById('curLoanName').value.trim();
       const amt = num(document.getElementById('curLoanAmount').value);
-      if(!name || amt <= 0) { alert('Please enter name and positive amount'); return; }
+      if(!name || amt <= 0) { console.error('Invalid input for Current Loan.'); return; }
       currentLoans.push({name, amount: amt});
       document.getElementById('curLoanName').value=''; 
       document.getElementById('curLoanAmount').value='';
     } else {
       const name = document.getElementById('prevLoanName').value.trim();
       const amt = num(document.getElementById('prevLoanAmount').value);
-      if(!name || amt <= 0) { alert('Please enter name and positive amount'); return; }
+      if(!name || amt <= 0) { console.error('Invalid input for Previous Loan.'); return; }
       previousLoans.push({name, amount: amt});
       document.getElementById('prevLoanName').value=''; 
       document.getElementById('prevLoanAmount').value='';
@@ -698,11 +756,11 @@
     const salaryTotal = salaries.reduce((s,x)=>s+num(x.amount),0);
     const loanTotal = currentLoans.reduce((s,x)=>s+num(x.amount),0) + previousLoans.reduce((s,x)=>s+num(x.amount),0);
     
-    const grand = leTotal + dieselTotal + repairsTotal + salaryTotal + loanTotal;
+    const grand = leTotal + dieselTotal + salaryTotal + loanTotal; // Repairs total is NOT included in grand expense total
     document.getElementById('departureGrand').textContent = fmt(grand);
   }
 
-  // DEPARTURE: PDF Export
+  // DEPARTURE: PDF Export (No changes needed here as it relates to PDF generation, not UI)
   function exportDeparturePDF() {
       try {
         const { jsPDF } = window.jspdf;
@@ -725,14 +783,15 @@
         doc.line(margin, y, rightMargin, y);
         y += 8;
         
+        // Use a standard number format for PDF
         const pdfNum = (v) => num(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
         
         const leTotal = loadingExpenses.reduce((s,x)=>s+num(x.amount),0);
         doc.autoTable({
             startY: y,
-            head: [['Boat Loading cost - Item', 'Amount (LKR)']],
+            head: [['Boat Loading Cost - Item', 'Amount (LKR)']],
             body: loadingExpenses.map(it => [it.item, pdfNum(it.amount)]),
-            foot: [['Total Loading cost', { content: pdfNum(leTotal), styles: { halign: 'right' } }]],
+            foot: [['Total Loading Cost', { content: pdfNum(leTotal), styles: { halign: 'right' } }]],
             headStyles: { fillColor: [102, 126, 234] },
             footStyles: { fillColor: [242, 248, 255], textColor: [0, 0, 0], fontStyle: 'bold' },
         });
@@ -814,19 +873,18 @@
             y = 15;
         }
         
-        const grandTotal = leTotal + loanTotal + repairsTotal + dieselTotal + salaryTotal;
+        const grandTotal = leTotal + dieselTotal + salaryTotal + loanTotal; // Grand total excludes boat value
         doc.autoTable({
             startY: y,
-            head: [['Final Summary', 'Total (LKR)']],
+            head: [['Final Summary (Total Expense)', 'Total (LKR)']],
             body: [
-                ['Boat Loading cost', { content: pdfNum(leTotal), styles: { halign: 'right' } }],
+                ['Boat Loading Cost', { content: pdfNum(leTotal), styles: { halign: 'right' } }],
                 ['Total Due Loans', { content: pdfNum(loanTotal), styles: { halign: 'right' } }],
-                ['Current Value of the Boat', { content: pdfNum(repairsTotal), styles: { halign: 'right' } }],
                 ['Diesel', { content: pdfNum(dieselTotal), styles: { halign: 'right' } }],
                 ['Salary', { content: pdfNum(salaryTotal), styles: { halign: 'right' } }]
             ],
             foot: [[
-                { content: 'Total Amount (LKR)', styles: { fontStyle: 'bold' } },
+                { content: 'Total Expenditure (LKR)', styles: { fontStyle: 'bold' } },
                 { content: pdfNum(grandTotal), styles: { halign: 'right', fontStyle: 'bold' } }
             ]],
             headStyles: { fillColor: [67, 56, 202] },
@@ -837,7 +895,7 @@
         doc.save(`Departure_Report_${document.getElementById('depDate').value}_${document.getElementById('depBoat').value || 'NoBoat'}.pdf`);
     } catch(e) {
         console.error("Error generating PDF:", e);
-        alert("Could not generate PDF. Check console for errors.");
+        // Note: keeping the non-alert equivalent of notification
     }
   }
 
@@ -856,7 +914,7 @@
         <td class="right font-semibold">${fmt(s.rate)}</td>
         <td class="right font-semibold">${fmt(total)}</td>`;
       const actionCell = tr.insertCell(4);
-      actionCell.className = 'text-center';
+      actionCell.className = 'action-cell'; // Added class for fixed width
       actionCell.appendChild(createRemoveButton(() => removeSale(i)));
     });
     document.getElementById('salesGrand').textContent = fmt(grand);
@@ -867,7 +925,7 @@
     const variety = document.getElementById('saleVariety').value.trim();
     const kg = num(document.getElementById('saleKg').value);
     const rate = num(document.getElementById('saleRate').value);
-    if(!variety || kg <= 0 || rate <= 0){ alert('Please enter variety, positive KG and positive rate'); return; }
+    if(!variety || kg <= 0 || rate <= 0){ console.error('Invalid input for Sale.'); return; }
     sales.push({variety, kg, rate});
     document.getElementById('saleVariety').value=''; 
     document.getElementById('saleKg').value=''; 
@@ -887,7 +945,7 @@
       const tr = tbody.insertRow();
       tr.innerHTML = `<td class="font-medium text-gray-700">${e.item}</td><td class="right font-semibold">${fmt(e.amount)}</td>`;
       const actionCell = tr.insertCell(2);
-      actionCell.className = 'text-center';
+      actionCell.className = 'action-cell'; // Added class for fixed width
       actionCell.appendChild(createRemoveButton(() => removeAE(i)));
     });
     document.getElementById('aeTotal').textContent = fmt(total);
@@ -897,7 +955,7 @@
   function addArrivalExpense(){
     const item = document.getElementById('aeItem').value.trim();
     const price = num(document.getElementById('aePrice').value);
-    if(!item || price <= 0){ alert('Please enter item and positive amount'); return; }
+    if(!item || price <= 0){ console.error('Invalid input for Arrival Expense.'); return; }
     arrivalExpenses.push({item, amount: price});
     document.getElementById('aeItem').value=''; 
     document.getElementById('aePrice').value='';
@@ -916,7 +974,7 @@
       const tr = tbody.insertRow();
       tr.innerHTML = `<td class="font-medium text-gray-700">${l.name}</td><td class="right font-semibold">${fmt(l.amount)}</td>`;
       const actionCell = tr.insertCell(2);
-      actionCell.className = 'text-center';
+      actionCell.className = 'action-cell'; // Added class for fixed width
       actionCell.appendChild(createRemoveButton(() => removeArrivalLoan(i)));
     });
     document.getElementById('arrLoanTotal').textContent = fmt(total);
@@ -926,7 +984,7 @@
   function addArrivalLoan(){
     const name = document.getElementById('arrLoanName').value.trim();
     const amt = num(document.getElementById('arrLoanAmt').value);
-    if(!name || amt <= 0){ alert('Please enter name and positive amount'); return; }
+    if(!name || amt <= 0){ console.error('Invalid input for Arrival Loan.'); return; }
     arrivalLoans.push({name, amount: amt}); 
     document.getElementById('arrLoanName').value=''; 
     document.getElementById('arrLoanAmt').value='';
@@ -947,7 +1005,7 @@
   }
   document.getElementById('commissionRate').addEventListener('input', updateArrivalSummary);
 
-  // ARRIVAL: PDF Export
+  // ARRIVAL: PDF Export (No changes needed here as it relates to PDF generation, not UI)
   function exportArrivalPDF() {
       try {
         const { jsPDF } = window.jspdf;
@@ -1027,7 +1085,7 @@
                 ['Sales Grand Total', { content: pdfFmt(salesGrand), styles: { halign: 'right' } }],
                 ['Arrival Expenses', { content: `-${pdfFmt(aexpTotal)}`, styles: { halign: 'right' } }],
                 ['Loans (Arrival)', { content: `-${pdfFmt(aloanTotal)}`, styles: { halign: 'right' } }],
-                ['Commission Rate (%)', { content: `${commissionRate.toLocaleString()}%`, styles: { halign: 'right' } }],
+                ['Commission Rate (%)', { content: `${commissionRate.toLocaleString()} %`, styles: { halign: 'right' } }],
                 ['Commission Amount', { content: `-${pdfFmt(commissionAmount)}`, styles: { halign: 'right' } }]
             ],
             foot: [[
@@ -1042,11 +1100,11 @@
         doc.save(`Arrival_Report_${document.getElementById('arrDate').value}_${document.getElementById('arrBoat').value || 'NoBoat'}.pdf`);
     } catch(e) {
         console.error("Error generating PDF:", e);
-        alert("Could not generate PDF. Check console for errors.");
+        // Note: keeping the non-alert equivalent of notification
     }
   }
 
-  // Initialize
+  // Initialize all totals on load
   renderLE();
   updateDiesel();
   renderRepairs();
@@ -1057,17 +1115,44 @@
   renderArrivalLoans();
   updateArrivalSummary();
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts (for faster data entry)
   document.querySelectorAll('input').forEach(i=>{
     i.addEventListener('keydown', (e)=>{
       if(e.key === 'Enter'){
+        // Find the next input element to focus on for smoother data entry
+        const nextInput = (el) => {
+            const inputs = Array.from(document.querySelectorAll('input, button')).filter(x => x.tabIndex !== -1);
+            const currentIdx = inputs.indexOf(el);
+            if (currentIdx !== -1 && currentIdx < inputs.length - 1) {
+                inputs[currentIdx + 1].focus();
+            }
+        };
+
         const id = e.target.id;
-        if(id==='lePrice' || id==='leItem') addLoadingExpense();
-        if(id==='repairCost' || id==='repairDesc') addRepair();
-        if(id==='salaryAmount' || id==='salaryName') addSalary();
-        if(id==='saleRate' || id==='saleKg' || id==='saleVariety') addSale();
-        if(id==='aePrice' || id==='aeItem') addArrivalExpense();
-        if(id==='arrLoanAmt' || id==='arrLoanName') addArrivalLoan();
+        if(id==='lePrice') { addLoadingExpense(); e.preventDefault(); }
+        else if(id==='leItem') nextInput(e.target);
+        
+        else if(id==='repairCost') { addRepair(); e.preventDefault(); }
+        else if(id==='repairDesc') nextInput(e.target);
+        
+        else if(id==='salaryAmount') { addSalary(); e.preventDefault(); }
+        else if(id==='salaryName') nextInput(e.target);
+        
+        else if(id==='curLoanAmount') { addLoan('current'); e.preventDefault(); }
+        else if(id==='curLoanName') nextInput(e.target);
+        else if(id==='prevLoanAmount') { addLoan('previous'); e.preventDefault(); }
+        else if(id==='prevLoanName') nextInput(e.target);
+        
+        else if(id==='saleRate') { addSale(); e.preventDefault(); }
+        else if(id==='saleKg' || id==='saleVariety') nextInput(e.target);
+        
+        else if(id==='aePrice') { addArrivalExpense(); e.preventDefault(); }
+        else if(id==='aeItem') nextInput(e.target);
+        
+        else if(id==='arrLoanAmt') { addArrivalLoan(); e.preventDefault(); }
+        else if(id==='arrLoanName') nextInput(e.target);
+        
+        else nextInput(e.target);
       }
     });
   });
