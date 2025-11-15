@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Manikshan Boat Report System</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- jspdf libraries for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+  /* Simple style for table consistency */
+  table th, table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e5e7eb; /* tailwind gray-200 */
+    text-align: left;
+    font-size: 14px;
+  }
+  table th {
+    background-color: #f9fafb; /* tailwind gray-50 */
+    font-weight: 600;
+  }
+</style>
+<script>
+  // Configure Tailwind to use Inter font
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+        },
+      },
+    },
+  }
+</script>
+</head>
+<body class="bg-slate-100 font-sans text-slate-900">
+
+<header class="bg-indigo-800 text-white shadow-lg">
+  <div class="max-w-6xl mx-auto p-4">
+    <h1 class="text-2xl font-bold tracking-tight">Manikshan Boat Report System</h1>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto p-4 md:p-6">
+
+  <!-- ======================
+       LANDING PAGE SECTION
+       ====================== -->
+  <section id="landing" class="">
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+      <div class="p-6 md:p-10">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-indigo-900 mb-4">Welcome,</h2>
+        <p class="text-lg text-slate-600 mb-8">Select a report to get started. All your data will be calculated and ready for export.</p>
+        
+        <!--  -->
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Departure Card Button -->
+          <div onclick="showSection('departure')" class="group p-6 bg-indigo-50 hover:bg-indigo-100 rounded-lg shadow-md cursor-pointer transition-all border border-indigo-200 hover:shadow-lg">
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0 bg-indigo-500 text-white rounded-full p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 12l-6-6m6 6l-6 6" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-2xl font-bold text-indigo-900 mb-2">Departure Report</h3>
+                <p class="text-slate-700 mb-4">Log all pre-trip expenses: fuel, repairs, salaries, and loans.</p>
+                <span class="font-semibold text-indigo-600 group-hover:underline">Start Departure Report &rarr;</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Arrival Card Button -->
+          <div onclick="showSection('arrival')" class="group p-6 bg-teal-50 hover:bg-teal-100 rounded-lg shadow-md cursor-pointer transition-all border border-teal-200 hover:shadow-lg">
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0 bg-teal-500 text-white rounded-full p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l6-6m-6 6l6 6" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 12h9" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m-3-3a9 9 0 100 12 9 9 0 000-12z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-2xl font-bold text-teal-900 mb-2">Arrival Report</h3>
+                <p class="text-slate-700 mb-4">Record sales, arrival expenses, and calculate final commission.</p>
+                <span class="font-semibold text-teal-600 group-hover:underline">Start Arrival Report &rarr;</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================
+       DEPARTURE REPORT SECTION
+       ====================== -->
+  <section id="departure" class="hidden">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-3xl font-bold text-indigo-900">Departure Report</h2>
+      <button onclick="showSection('landing')" class="text-sm font-medium text-indigo-600 hover:underline">&larr; Back to Landing Page</button>
+    </div>
+
+    <!-- Date & Boat -->
+    <div class="bg-white p-4 md:p-6 rounded-lg shadow-md mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="md:col-span-2">
+          <label for="depDate" class="block text-sm font-medium text-slate-700 mb-1">Date</label>
+          <input type="date" id="depDate" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        <div>
+          <label for="depBoat" class="block text-sm font-medium text-slate-700 mb-1">Boat</label>
+          <input type="text" id="depBoat" placeholder="Boat name / ID" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Sections -->
+    <div class="space-y-6">
+      <!-- Loading Expenses -->
+      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-4 text-slate-800">Loading Expenses</h3>
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+          <input type="text" id="leItem" placeholder="Item description (e.g., loading labour)" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
+          <input type="number" id="lePrice" placeholder="Price (LKR)" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
+          <button onclick="addLoadingExpense()" class="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 transition-colors">Add Cost</button>
+        </div>
+        <table id="leTable" class="w-full table-auto">
+          <thead><tr><th>Item</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="flex justify-end items-center gap-4 mt-4">
+          <span class="text-slate-600">Loading Expenses Total:</span>
+          <span id="leTotal" class="text-xl font-bold text-indigo-900">LKR 0.00</span>
+        </div>
+      </div>
+
+      <!-- Diesel Cost -->
+      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-4 text-slate-800">Diesel Cost</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="dieselLiters" class="block text-sm font-medium text-slate-700 mb-1">Liters</label>
+            <input type="number" id="dieselLiters" step="0.01" min="0" value="0" class="w-full p-2 border border-slate-300 rounded-md shadow-sm">
+          </div>
+          <div>
+            <label for="dieselRate" class="block text-sm font-medium text-slate-700 mb-1">Rate (LKR / litre)</label>
+            <input type="number" id="dieselRate" value="277" step="0.01" class="w-full p-2 border border-slate-300 rounded-md shadow-sm">
+          </div>
+        </div>
+        <div class="flex justify-end items-center gap-4 mt-4">
+          <span class="text-slate-600">Diesel Total:</span>
+          <span id="dieselTotal" class="text-xl font-bold text-indigo-900">LKR 0.00</span>
+        </div>
+      </div>
+
+      <!-- Boat Value / Repairs -->
+      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-4 text-slate-800">Boat Value / Repairs</h3>
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+          <input type="text" id="repairDesc" placeholder="e.g., engine service" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
+          <input type="number" id="repairCost" value="0" min="0" step="0.01" placeholder="Cost (LKR)" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
+          <button onclick="addRepair()" class="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 transition-colors">Add Repair</button>
+        </div>
+        <table id="repairTable" class="w-full table-auto">
+          <thead><tr><th>Description</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="flex justify-end items-center gap-4 mt-4">
+          <span class="text-slate-600">Boat Repairs Total:</span>
+          <span id="repairsTotal" class="text-xl font-bold text-indigo-900">LKR 0.00</span>
+        </div>
+      </div>
+
+      <!-- Salary -->
+      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-4 text-slate-800">Salary</h3>
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+          <input type="text" id="salaryName" placeholder="Employee/Staff Name" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
+          <input type="number" id="salaryAmount" placeholder="Amount (LKR)" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
+          <button onclick="addSalary()" class="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 transition-colors">Add Salary</button>
+        </div>
+        <table id="salaryTable" class="w-full table-auto">
+          <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="flex justify-end items-center gap-4 mt-4">
+          <span class="text-slate-600">Salary Total:</span>
+          <span id="salaryTotal" class="text-xl font-bold text-indigo-900">LKR 0.00</span>
+        </div>
+      </div>
+
+      <!-- Loans -->
+      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-4 text-slate-800">Loan Summary</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Current Loans -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Current Loans</label>
+            <div class="flex flex-col md:flex-row gap-2 mb-3">
+              <input type="text" id="curLoanName" placeholder="Name" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
+              <input type="number" id="curLoanAmount" placeholder="LKR" class="md:w-32 p-2 border border-slate-300 rounded-md shadow-sm">
+              <button onclick="addLoan('current')" class="bg-indigo-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-600 transition-colors">Add</button>
+            </div>
+            <table id="curLoanTable" class="w-full table-auto">
+              <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <!-- Previous Loans -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Previous Loans</label>
+            <div class="flex flex-col md:flex-row gap-2 mb-3">
+              <input type="text" id="prevLoanName" placeholder="Name" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
+              <input type="number" id="prevLoanAmount" placeholder="LKR" class="md:w-32 p-2 border border-slate-300 rounded-md shadow-sm">
+              <button onclick="addLoan('previous')" class="bg-indigo-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-600 transition-colors">Add</button>
+            </div>
+            <table id="prevLoanTable" class="w-full table-auto">
+              <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="flex justify-end items-center gap-4 mt-4 border-t pt-4">
+          <span class="text-slate-600">Total Due Loans:</span>
+          <span id="loanTotal" class="text-xl font-bold text-indigo-900">LKR 0.00</span>
+        </div>
+      </div>
+
+      <!-- Departure Totals -->
+      <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg">
+        <h3 class="text-xl font-semibold mb-4 text-slate-800">Departure Totals</h3>
+        <div class="space-y-2">
+          <div class="flex justify-between items-center"><span class="text-slate-600">Loading Expenses</span><span id="summary_le" class="font-medium text-slate-800">LKR 0.00</span></div>
+          <div class="flex justify-between items-center"><span class="text-slate-600">Diesel</span><span id="summary_diesel" class="font-medium text-slate-800">LKR 0.00</span></div>
+          <div class="flex justify-between items-center"><span class="text-slate-600">Boat Repairs</span><span id="summary_repairs" class="font-medium text-slate-800">LKR 0.00</span></div>
+          <div class="flex justify-between items-center"><span class="text-slate-600">Salary</span><span id="summary_salary" class="font-medium text-slate-800">LKR 0.00</span></div>
+          <div class="flex justify-between items-center"><span class="text-slate-600">Total Loans</span><span id="summary_loans" class="font-medium text-slate-800">LKR 0.00</span></div>
+        </div>
+        <div class="flex justify-between items-center mt-4 pt-4 border-t border-indigo-200">
+          <span class="text-xl font-bold text-indigo-900">Total Amount (LKR)</span>
+          <span id="departureGrand" class="text-2xl font-extrabold text-indigo-900">LKR 0.00</span>
+        </div>
+      </div>
+
+      <!-- PDF Export Button -->
+      <div class="text-right mt-6">
+          <button onclick="exportDeparturePDF()" class="bg-green-600 text-white px-6 py-3 rounded-md shadow-lg hover:bg-green-700 transition-all font-semibold text-lg">
+            Export Departure Report (PDF)
+          </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================
+       ARRIVAL REPORT SECTION
+       ====================== -->
+  <section id="arrival" class="hidden">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-3xl font-bold text-teal-900">Arrival Report</h2>
+      <button onclick="showSection('landing')" class="text-sm font-medium text-teal-600 hover:underline">&larr; Back to Landing Page</button>
+    </div>
+
+    <!-- Date & Boat -->
+    <div class="bg-white p-4 md:p-6 rounded-lg shadow-md mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="md:col-span-2">
+          <label for="arrDate" class="block text-sm font-medium text-slate-700 mb-1">Date</label>
+          <input type="date" id="arrDate" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+        </div>
+        <div>
+          <label for="arrBoat" class="block text-sm font-medium text-slate-700 mb-1">Boat</label>
+          <input type="text" id="arrBoat" placeholder="Boat name / ID" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+        </div>
+      </div>
+    </div>
+    
+    <div class="space-y-6">
+      <!-- Sales Table -->
+      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-4 text-slate-800">Sales (Variety / KG / Amount per KG)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+          <input type="text" id="saleVariety" placeholder="Variety (e.g., Tuna)" class="md:col-span-2 p-2 border border-slate-300 rounded-md shadow-sm">
+          <input type="number" id="saleKg" placeholder="KG" step="0.01" class="p-2 border border-slate-300 rounded-md shadow-sm">
+          <input type="number" id="saleRate" placeholder="Amount per KG" step="0.01" class="p-2 border border-slate-300 rounded-md shadow-sm">
+        </div>
+        <button onclick="addSale()" class="w-full bg-teal-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-teal-700 transition-colors mb-4">Add Sale</B>
+        <table id="saleTable" class="w-full table-auto">
+          <thead><tr><th>Variety</th><th class="right">KG</th><th class="right">Rate / KG</th><th class="right">Total</th><th class="w-24">Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="flex justify-end items-center gap-4 mt-4">
+          <span class="text-slate-600">Sales Grand Total:</span>
+          <span id="salesGrand" class="text-xl font-bold text-teal-900">LKR 0.00</span>
+        </div>
+      </div>
+
+      <!-- Arrival Expenses -->
+      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-4 text-slate-800">Arrival Expenses</h3>
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+          <input type="text" id="aeItem" placeholder="Expense item (e.g., unloading)" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
+          <input type="number" id="aePrice" placeholder="Amount (LKR)" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
+          <button onclick="addArrivalExpense()" class="w-full md:w-auto bg-teal-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-teal-700 transition-colors">Add Expense</button>
+        </div>
+        <table id="aeTable" class="w-full table-auto">
+          <thead><tr><th>Item</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="flex justify-end items-center gap-4 mt-4">
+          <span class="text-slate-600">Arrival Expenses Total:</span>
+          <span id="aeTotal" class="text-xl font-bold text-teal-900">LKR 0.00</span>
+        </div>
+      </div>
+      
+      <!-- Loans (Arrival-side) -->
+      <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-4 text-slate-800">Loans (Arrival)</h3>
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+          <input type="text" id="arrLoanName" placeholder="Name" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
+          <input type="number" id="arrLoanAmt" placeholder="Amount LKR" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
+          <button onclick="addArrivalLoan()" class="w-full md:w-auto bg-teal-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-teal-700 transition-colors">Add Loan</button>
+        </div>
+        <table id="arrLoanTable" class="w-full table-auto">
+          <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="flex justify-end items-center gap-4 mt-4">
+          <span class="text-slate-600">Arrival Loans Total:</span>
+          <span id="arrLoanTotal" class="text-xl font-bold text-teal-900">LKR 0.00</span>
+        </div>
+      </div>
+      
+      <!-- Commission & Final Summary -->
+      <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg">
+        <h3 class="text-xl font-semibold mb-4 text-slate-800">Summary & Commission</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center"><span class="text-slate-600">Sales Grand Total</span><span id="sum_sales" class="font-medium text-slate-800">LKR 0.00</span></div>
+          <div class="flex justify-between items-center"><span class="text-slate-600">Arrival Expenses</span><span id="sum_aexp" class="font-medium text-slate-800">LKR 0.00</span></div>
+          <div class="flex justify-between items-center"><span class="text-slate-600">Loans (Arrival)</span><span id="sum_aloan" class="font-medium text-slate-800">LKR 0.00</span></div>
+          <div class="flex justify-between items-center">
+            <label for="commissionRate" class="text-slate-600">Commission Rate (%)</label>
+            <input type="number" id="commissionRate" value="5" step="0.1" class="w-24 p-2 border border-slate-300 rounded-md shadow-sm">
+          </div>
+          <div class="flex justify-between items-center text-lg pt-2 border-t">
+            <span class="font-semibold text-slate-700">Commission Amount</span>
+            <span id="commissionAmount" class="font-bold text-slate-900">LKR 0.00</span>
+          </div>
+        </div>
+        <div class="flex justify-between items-center mt-4 pt-4 border-t border-teal-200">
+          <span class="text-xl font-bold text-teal-900">Net To Owner</span>
+          <span id="netToOwner" class="text-2xl font-extrabold text-teal-900">LKR 0.00</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer class="text-center p-6 text-slate-500 text-sm">
+  Built for Charu — Manikshan Boat Report System
+</footer>
+
+<script>
+  // Initialize default dates to today
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('depDate').value = today;
+  document.getElementById('arrDate').value = today;
+
+  // Show section helper
+  function showSection(idToShow){
+    document.querySelectorAll('main section').forEach(section => {
+      if(section.id === idToShow) {
+        section.classList.remove('hidden');
+      } else {
+        section.classList.add('hidden');
+      }
+    });
+    // Scroll to top when changing sections
+    window.scrollTo(0, 0);
+  }
+
+  // Utility formatting
+  function fmt(v){ return 'LKR ' + Number(v || 0).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
+  function num(v){ return Number(v || 0); }
+  
+  // Custom styled remove button
+  function createRemoveButton(onClickFunction) {
+      const btn = document.createElement('button');
+      btn.className = "bg-red-100 text-red-700 px-3 py-1 rounded-md text-sm hover:bg-red-200 transition-colors";
+      btn.textContent = 'Remove';
+      btn.onclick = onClickFunction;
+      return btn;
+  }
+
+  /* ----------------------
+     DEPARTURE: Loading Expenses
+     ---------------------- */
+  const loadingExpenses = [];
+  function renderLE(){
+    const tbody = document.querySelector('#leTable tbody');
+    tbody.innerHTML = '';
+    let total = 0;
+    loadingExpenses.forEach((it, idx) => {
+      total += num(it.amount);
+      const tr = tbody.insertRow();
+      tr.innerHTML = `<td>${it.item}</td><td class="right">${fmt(it.amount)}</td>`;
+      tr.insertCell(2).appendChild(createRemoveButton(() => removeLE(idx)));
+    });
+    document.getElementById('leTotal').textContent = fmt(total);
+    document.getElementById('summary_le').textContent = fmt(total);
+    updateDepartureGrand();
+  }
+  function addLoadingExpense(){
+    const item = document.getElementById('leItem').value.trim();
+    const price = num(document.getElementById('lePrice').value);
+    if(!item || price <= 0) { console.warn('Enter item and positive price'); return; }
+    loadingExpenses.push({item, amount: price});
+    document.getElementById('leItem').value=''; document.getElementById('lePrice').value='';
+    renderLE();
+  }
+  function removeLE(i){ loadingExpenses.splice(i,1); renderLE(); }
+
+  /* ----------------------
+     DEPARTURE: Diesel
+     ---------------------- */
+  function updateDiesel(){
+    const liters = num(document.getElementById('dieselLiters').value);
+    const rate = num(document.getElementById('dieselRate').value);
+    const total = liters * rate;
+    document.getElementById('dieselTotal').textContent = fmt(total);
+    document.getElementById('summary_diesel').textContent = fmt(total);
+    updateDepartureGrand();
+  }
+  document.getElementById('dieselLiters').addEventListener('input', updateDiesel);
+  document.getElementById('dieselRate').addEventListener('input', updateDiesel);
+
+  /* ----------------------
+     DEPARTURE: Repairs
+     ---------------------- */
+  const repairs = [];
+  function renderRepairs(){
+    const tbody = document.querySelector('#repairTable tbody');
+    tbody.innerHTML = '';
+    let total = 0;
+    repairs.forEach((r, i) => {
+      total += num(r.cost);
+      const tr = tbody.insertRow();
+      tr.innerHTML = `<td>${r.desc}</td><td class="right">${fmt(r.cost)}</td>`;
+      tr.insertCell(2).appendChild(createRemoveButton(() => removeRepair(i)));
+    });
+    document.getElementById('repairsTotal').textContent = fmt(total);
+    document.getElementById('summary_repairs').textContent = fmt(total);
+    updateDepartureGrand();
+  }
+  function addRepair(){
+    const desc = document.getElementById('repairDesc').value.trim();
+    const cost = num(document.getElementById('repairCost').value);
+    if(!desc || cost <= 0){ console.warn('Enter repair description and positive cost'); return; }
+    repairs.push({desc, cost});
+    document.getElementById('repairDesc').value=''; document.getElementById('repairCost').value=0;
+    renderRepairs();
+  }
+  function removeRepair(i){ repairs.splice(i,1); renderRepairs(); }
+
+  /* ----------------------
+     DEPARTURE: Salary (NEW)
+     ---------------------- */
+  const salaries = [];
+  function renderSalaries(){
+    const tbody = document.querySelector('#salaryTable tbody');
+    tbody.innerHTML = '';
+    let total = 0;
+    salaries.forEach((s, i) => {
+      total += num(s.amount);
+      const tr = tbody.insertRow();
+      tr.innerHTML = `<td>${s.name}</td><td class="right">${fmt(s.amount)}</td>`;
+      tr.insertCell(2).appendChild(createRemoveButton(() => removeSalary(i)));
+    });
+    document.getElementById('salaryTotal').textContent = fmt(total);
+    document.getElementById('summary_salary').textContent = fmt(total);
+    updateDepartureGrand();
+  }
+  function addSalary(){
+    const name = document.getElementById('salaryName').value.trim();
+    const amount = num(document.getElementById('salaryAmount').value);
+    if(!name || amount <= 0){ console.warn('Enter name and positive salary amount'); return; }
+    salaries.push({name, amount});
+    document.getElementById('salaryName').value=''; document.getElementById('salaryAmount').value='';
+    renderSalaries();
+  }
+  function removeSalary(i){ salaries.splice(i,1); renderSalaries(); }
+
+
+  /* ----------------------
+     DEPARTURE: Loans
+     ---------------------- */
+  const currentLoans = [];
+  const previousLoans = [];
+  function renderLoans(){
+    // Current
+    let tbodyCur = document.querySelector('#curLoanTable tbody');
+    tbodyCur.innerHTML = '';
+    let curTotal = 0;
+    currentLoans.forEach((l,i) => {
+      curTotal += num(l.amount);
+      const tr = tbodyCur.insertRow();
+      tr.innerHTML = `<td>${l.name}</td><td class="right">${fmt(l.amount)}</td>`;
+      tr.insertCell(2).appendChild(createRemoveButton(() => removeLoan('current', i)));
+    });
+    // Previous
+    let tbodyPrev = document.querySelector('#prevLoanTable tbody');
+    tbodyPrev.innerHTML = '';
+    let prevTotal = 0;
+    previousLoans.forEach((l,i) => {
+      prevTotal += num(l.amount);
+      const tr = tbodyPrev.insertRow();
+      tr.innerHTML = `<td>${l.name}</td><td class="right">${fmt(l.amount)}</td>`;
+      tr.insertCell(2).appendChild(createRemoveButton(() => removeLoan('previous', i)));
+    });
+    const loanTotal = curTotal + prevTotal;
+    document.getElementById('loanTotal').textContent = fmt(loanTotal);
+    document.getElementById('summary_loans').textContent = fmt(loanTotal); // Update summary
+    updateDepartureGrand();
+  }
+  function addLoan(which){
+    if(which === 'current'){
+      const name = document.getElementById('curLoanName').value.trim();
+      const amt = num(document.getElementById('curLoanAmount').value);
+      if(!name || amt <= 0) { console.warn('Enter name and positive amount'); return; }
+      currentLoans.push({name, amount: amt});
+      document.getElementById('curLoanName').value=''; document.getElementById('curLoanAmount').value='';
+    } else {
+      const name = document.getElementById('prevLoanName').value.trim();
+      const amt = num(document.getElementById('prevLoanAmount').value);
+      if(!name || amt <= 0) { console.warn('Enter name and positive amount'); return; }
+      previousLoans.push({name, amount: amt});
+      document.getElementById('prevLoanName').value=''; document.getElementById('prevLoanAmount').value='';
+    }
+    renderLoans();
+  }
+  function removeLoan(which,i){
+    if(which === 'current') currentLoans.splice(i,1);
+    else previousLoans.splice(i,1);
+    renderLoans();
+  }
+
+  /* ----------------------
+     DEPARTURE: Grand total
+     ---------------------- */
+  function updateDepartureGrand(){
+    const leTotal = loadingExpenses.reduce((s,x)=>s+num(x.amount),0);
+    const dieselTotal = num(document.getElementById('dieselLiters').value) * num(document.getElementById('dieselRate').value);
+    const repairsTotal = repairs.reduce((s,x)=>s+num(x.cost),0);
+    const salaryTotal = salaries.reduce((s,x)=>s+num(x.amount),0);
+    const loanTotal = currentLoans.reduce((s,x)=>s+num(x.amount),0) + previousLoans.reduce((s,x)=>s+num(x.amount),0);
+    
+    const grand = leTotal + dieselTotal + repairsTotal + salaryTotal + loanTotal;
+    
+    document.getElementById('departureGrand').textContent = fmt(grand);
+  }
+
+  /* ----------------------
+     DEPARTURE: PDF Export
+     ---------------------- */
+  function exportDeparturePDF() {
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        let y = 15;
+        const margin = 15;
+        const rightMargin = 195; // Page width - margin (210 - 15)
+
+        // Title
+        doc.setFontSize(18);
+        doc.text("Departure Report", 105, y, { align: 'center' });
+        y += 10;
+
+        // Header Info
+        doc.setFontSize(12);
+        doc.text(`Date: ${document.getElementById('depDate').value}`, margin, y);
+        doc.text(`Boat: ${document.getElementById('depBoat').value}`, 110, y);
+        y += 10;
+        doc.setLineWidth(0.5);
+        doc.line(margin, y, rightMargin, y);
+        y += 8;
+        
+        const pdfNum = (v) => num(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+
+        // --- Loading Expenses ---
+        const leTotal = loadingExpenses.reduce((s,x)=>s+num(x.amount),0);
+        doc.autoTable({
+            startY: y,
+            head: [['Loading Expenses - Item', 'Amount (LKR)']],
+            body: loadingExpenses.map(it => [it.item, pdfNum(it.amount)]),
+            foot: [['Total Loading Expenses', { content: pdfNum(leTotal), styles: { halign: 'right' } }]],
+            headStyles: { fillColor: '#0b66c3' },
+            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
+            didDrawPage: (data) => { y = data.cursor.y; }
+        });
+        y = doc.autoTable.previous.finalY + 10;
+
+        // --- Diesel ---
+        const dieselLiters = num(document.getElementById('dieselLiters').value);
+        const dieselRate = num(document.getElementById('dieselRate').value);
+        const dieselTotal = dieselLiters * dieselRate;
+        doc.autoTable({
+            startY: y,
+            head: [['Diesel', 'Value']],
+            body: [
+                ['Liters', pdfNum(dieselLiters) + ' L'],
+                ['Rate (LKR / litre)', pdfNum(dieselRate)]
+            ],
+            foot: [['Total Diesel', { content: pdfNum(dieselTotal), styles: { halign: 'right' } }]],
+            headStyles: { fillColor: '#0b66c3' },
+            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
+            didDrawPage: (data) => { y = data.cursor.y; }
+        });
+        y = doc.autoTable.previous.finalY + 10;
+
+        // --- Boat Repairs ---
+        const repairsTotal = repairs.reduce((s,x)=>s+num(x.cost),0);
+        doc.autoTable({
+            startY: y,
+            head: [['Boat Repairs - Description', 'Cost (LKR)']],
+            body: repairs.map(r => [r.desc, pdfNum(r.cost)]),
+            foot: [['Total Boat Repairs', { content: pdfNum(repairsTotal), styles: { halign: 'right' } }]],
+            headStyles: { fillColor: '#0b66c3' },
+            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
+            didDrawPage: (data) => { y = data.cursor.y; }
+        });
+        y = doc.autoTable.previous.finalY + 10;
+
+        // --- Salary ---
+        const salaryTotal = salaries.reduce((s,x)=>s+num(x.amount),0);
+        doc.autoTable({
+            startY: y,
+            head: [['Salary - Name', 'Amount (LKR)']],
+            body: salaries.map(s => [s.name, pdfNum(s.amount)]),
+            foot: [['Total Salary', { content: pdfNum(salaryTotal), styles: { halign: 'right' } }]],
+            headStyles: { fillColor: '#0b66c3' },
+            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
+            didDrawPage: (data) => { y = data.cursor.y; }
+        });
+        y = doc.autoTable.previous.finalY + 10;
+
+        // --- Loans ---
+        const loanTotal = currentLoans.reduce((s,x)=>s+num(x.amount),0) + previousLoans.reduce((s,x)=>s+num(x.amount),0);
+        let loanBody = [];
+        if (currentLoans.length > 0) {
+            loanBody.push([{ content: 'Current Loans', colSpan: 2, styles: { fontStyle: 'bold', fillColor: '#f9f9f9' } }]);
+            currentLoans.forEach(l => loanBody.push([l.name, pdfNum(l.amount)]));
+        }
+        if (previousLoans.length > 0) {
+            loanBody.push([{ content: 'Previous Loans', colSpan: 2, styles: { fontStyle: 'bold', fillColor: '#f9f9f9' } }]);
+            previousLoans.forEach(l => loanBody.push([l.name, pdfNum(l.amount)]));
+        }
+        if (loanBody.length === 0) {
+            loanBody.push([[{content: 'No loans reported.', colSpan: 2, styles: { halign: 'center' }}]]);
+        }
+        
+        doc.autoTable({
+            startY: y,
+            head: [['Loans - Name', 'Amount (LKR)']],
+            body: loanBody,
+            foot: [['Total Loans', { content: pdfNum(loanTotal), styles: { halign: 'right' } }]],
+            headStyles: { fillColor: '#0b66c3' },
+            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
+            didDrawPage: (data) => { y = data.cursor.y; }
+        });
+        y = doc.autoTable.previous.finalY + 10;
+
+
+        // --- Grand Total ---
+        if (y > 270) {
+            doc.addPage();
+            y = 15;
+        }
+        
+        doc.setFontSize(16);
+        doc.setFont(undefined, 'bold');
+        doc.text("Departure Grand Total:", margin, y);
+        doc.text(document.getElementById('departureGrand').textContent, rightMargin, y, { align: 'right' });
+
+        doc.save(`Departure_Report_${document.getElementById('depDate').value}_${document.getElementById('depBoat').value || 'NoBoat'}.pdf`);
+    } catch(e) {
+        console.error("Error generating PDF:", e);
+        console.warn("Could not generate PDF. Check console for errors.");
+    }
+  }
+
+
+  /* ======================
+     ARRIVAL: FULL SYSTEM
+     ====================== */
+  const sales = [];
+  function renderSales(){
+    const tbody = document.querySelector('#saleTable tbody'); tbody.innerHTML = '';
+    let grand = 0;
+    sales.forEach((s,i) => {
+      const total = num(s.kg) * num(s.rate);
+      grand += total;
+      const tr = tbody.insertRow();
+      tr.innerHTML = `<td>${s.variety}</td>
+        <td class="right">${Number(s.kg).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+        <td class="right">${fmt(s.rate)}</td>
+        <td class="right">${fmt(total)}</td>`;
+      tr.insertCell(4).appendChild(createRemoveButton(() => removeSale(i)));
+    });
+    document.getElementById('salesGrand').textContent = fmt(grand);
+    document.getElementById('sum_sales').textContent = fmt(grand);
+    updateArrivalSummary();
+  }
+  function addSale(){
+    const variety = document.getElementById('saleVariety').value.trim();
+    const kg = num(document.getElementById('saleKg').value);
+    const rate = num(document.getElementById('saleRate').value);
+    if(!variety || kg <= 0 || rate <= 0){ console.warn('Enter variety, positive KG and positive rate'); return; }
+    sales.push({variety, kg, rate});
+    document.getElementById('saleVariety').value=''; document.getElementById('saleKg').value=''; document.getElementById('saleRate').value='';
+    renderSales();
+  }
+  function removeSale(i){ sales.splice(i,1); renderSales(); }
+
+  // Arrival expenses
+  const arrivalExpenses = [];
+  function renderAE(){
+    const tbody = document.querySelector('#aeTable tbody'); tbody.innerHTML = '';
+    let total = 0;
+    arrivalExpenses.forEach((e,i)=>{
+      total += num(e.amount);
+      const tr = tbody.insertRow();
+      tr.innerHTML = `<td>${e.item}</td><td class="right">${fmt(e.amount)}</td>`;
+      tr.insertCell(2).appendChild(createRemoveButton(() => removeAE(i)));
+    });
+    document.getElementById('aeTotal').textContent = fmt(total);
+    document.getElementById('sum_aexp').textContent = fmt(total);
+    updateArrivalSummary();
+  }
+  function addArrivalExpense(){
+    const item = document.getElementById('aeItem').value.trim();
+    const price = num(document.getElementById('aePrice').value);
+    if(!item || price <= 0){ console.warn('Enter item and positive amount'); return; }
+    arrivalExpenses.push({item, amount: price});
+    document.getElementById('aeItem').value=''; document.getElementById('aePrice').value='';
+    renderAE();
+  }
+  function removeAE(i){ arrivalExpenses.splice(i,1); renderAE(); }
+
+  // Arrival loans
+  const arrivalLoans = [];
+  function renderArrivalLoans(){
+    const tbody = document.querySelector('#arrLoanTable tbody'); tbody.innerHTML = '';
+    let total = 0;
+    arrivalLoans.forEach((l,i)=>{
+      total += num(l.amount);
+      const tr = tbody.insertRow();
+      tr.innerHTML = `<td>${l.name}</td><td class="right">${fmt(l.amount)}</td>`;
+      tr.insertCell(2).appendChild(createRemoveButton(() => removeArrivalLoan(i)));
+    });
+    document.getElementById('arrLoanTotal').textContent = fmt(total);
+    document.getElementById('sum_aloan').textContent = fmt(total);
+    updateArrivalSummary();
+  }
+  function addArrivalLoan(){
+    const name = document.getElementById('arrLoanName').value.trim();
+    const amt = num(document.getElementById('arrLoanAmt').value);
+    if(!name || amt <= 0){ console.warn('Enter name and positive amount'); return; }
+    // Note: The original file had a bug here, 'amount' was not defined. Fixed to 'amt'.
+    arrivalLoans.push({name, amount: amt}); 
+    document.getElementById('arrLoanName').value=''; document.getElementById('arrLoanAmt').value='';
+    renderArrivalLoans();
+  }
+  function removeArrivalLoan(i){ arrivalLoans.splice(i,1); renderArrivalLoans(); }
+
+  // Commission & Net calculation
+  function updateArrivalSummary(){
+    const salesGrand = sales.reduce((s,x)=> s + (num(x.kg) * num(x.rate)), 0);
+    const aexp = arrivalExpenses.reduce((s,x)=> s + num(x.amount), 0);
+    const aloan = arrivalLoans.reduce((s,x)=> s + num(x.amount), 0);
+    const cr = num(document.getElementById('commissionRate').value) / 100;
+    const commission = salesGrand * cr;
+    const net = salesGrand - aexp - aloan - commission;
+    document.getElementById('commissionAmount').textContent = fmt(commission);
+    document.getElementById('netToOwner').textContent = fmt(net);
+  }
+  document.getElementById('commissionRate').addEventListener('input', updateArrivalSummary);
+
+  /* ----------------------
+     Wire up event handlers
+     ---------------------- */
+  // Make functions globally accessible for onclick attributes
+  window.showSection = showSection;
+  window.addLoadingExpense = addLoadingExpense;
+  window.removeLE = removeLE;
+  window.addRepair = addRepair;
+  window.removeRepair = removeRepair;
+  window.addSalary = addSalary;
+  window.removeSalary = removeSalary;
+  window.addLoan = addLoan;
+  window.removeLoan = removeLoan;
+  window.exportDeparturePDF = exportDeparturePDF;
+  window.addSale = addSale;
+  window.removeSale = removeSale;
+  window.addArrivalExpense = addArrivalExpense;
+  window.removeAE = removeAE;
+  window.addArrivalLoan = addArrivalLoan;
+  window.removeArrivalLoan = removeArrivalLoan;
+
+  // Basic init
+  renderLE();
+  updateDiesel();
+  renderRepairs();
+  renderSalaries();
+  renderLoans();
+  renderSales();
+  renderAE();
+  renderArrivalLoans();
+  updateArrivalSummary();
+
+  // Keyboard-friendly quick-add using Enter
+  document.querySelectorAll('input').forEach(i=>{
+    i.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){
+        const id = e.target.id;
+        if(id==='lePrice' || id==='leItem') addLoadingExpense();
+        if(id==='repairCost' || id==='repairDesc') addRepair();
+        if(id==='salaryAmount' || id==='salaryName') addSalary();
+        if(id==='saleRate' || id==='saleKg' || id==='saleVariety') addSale();
+        if(id==='aePrice' || id==='aeItem') addArrivalExpense();
+        if(id==='arrLoanAmt' || id==='arrLoanName') addArrivalLoan();
+      }
+    });
+  });
+</script>
+</body>
+</html>
