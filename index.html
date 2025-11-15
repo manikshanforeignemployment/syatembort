@@ -51,7 +51,7 @@
   <section id="landing" class="">
     <div class="bg-white rounded-lg shadow-xl overflow-hidden">
       <div class="p-6 md:p-10">
-        <h2 class="text-3xl md:text-4xl font-extrabold text-indigo-900 mb-4">Welcome, !</h2>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-indigo-900 mb-4">Welcome, Charu!</h2>
         <p class="text-lg text-slate-600 mb-8">Select a report to get started. All your data will be calculated and ready for export.</p>
         
         <!--  -->
@@ -294,13 +294,13 @@
     <div class="space-y-6">
       <!-- Sales Table -->
       <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold mb-4 text-slate-800">Sales (Variety / KG / Amount per KG)</h3>
+        <h3 class="text-xl font-semibold mb-4 bg-slate-900 text-white p-2 rounded-md">Sales (Variety / KG / Amount per KG)</h3>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <input type="text" id="saleVariety" placeholder="Variety (e.g., Tuna)" class="md:col-span-2 p-2 border border-slate-300 rounded-md shadow-sm">
           <input type="number" id="saleKg" placeholder="KG" step="0.01" class="p-2 border border-slate-300 rounded-md shadow-sm">
           <input type="number" id="saleRate" placeholder="Amount per KG" step="0.01" class="p-2 border border-slate-300 rounded-md shadow-sm">
         </div>
-        <button onclick="addSale()" class="w-full bg-teal-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-teal-700 transition-colors mb-4">Add Sale</B>
+        <button onclick="addSale()" class="w-full bg-teal-600 text-white px-4 py-2 rounded-md shadow-lg hover:bg-teal-700 transition-colors mb-4 font-bold">Add New Sale Entry</button>
         <table id="saleTable" class="w-full table-auto">
           <thead><tr><th>Variety</th><th class="right">KG</th><th class="right">Rate / KG</th><th class="right">Total</th><th class="w-24">Action</th></tr></thead>
           <tbody></tbody>
@@ -368,6 +368,14 @@
           <span id="netToOwner" class="text-2xl font-extrabold text-teal-900">LKR 0.00</span>
         </div>
       </div>
+      
+      <!-- START: New PDF Export Button for Arrival Report -->
+      <div class="text-right mt-6">
+          <button onclick="exportArrivalPDF()" class="bg-green-600 text-white px-6 py-3 rounded-md shadow-lg hover:bg-green-700 transition-all font-semibold text-lg">
+            Export Arrival Report (PDF)
+          </button>
+      </div>
+      <!-- END: New PDF Export Button for Arrival Report -->
     </div>
 
   </section>
@@ -739,6 +747,113 @@
     }
   }
 
+  // START: New PDF Export function for Arrival Report
+  function exportArrivalPDF() {
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        let y = 15;
+        const margin = 15;
+        const rightMargin = 195; // Page width - margin (210 - 15)
+
+        // Title
+        doc.setFontSize(18);
+        doc.text("Arrival Report", 105, y, { align: 'center' });
+        y += 10;
+
+        // Header Info
+        doc.setFontSize(12);
+        doc.text(`Date: ${document.getElementById('arrDate').value}`, margin, y);
+        doc.text(`Boat: ${document.getElementById('arrBoat').value}`, 110, y);
+        y += 10;
+        doc.setLineWidth(0.5);
+        doc.line(margin, y, rightMargin, y);
+        y += 8;
+        
+        const pdfNum = (v) => num(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+        const pdfFmt = (v) => fmt(v);
+
+        // --- 1. Sales ---
+        const salesGrand = sales.reduce((s,x)=> s + (num(x.kg) * num(x.rate)), 0);
+        doc.autoTable({
+            startY: y,
+            head: [['Variety', 'KG', 'Rate / KG (LKR)', 'Total (LKR)']],
+            body: sales.map(s => [
+                s.variety, 
+                pdfNum(s.kg), 
+                pdfNum(s.rate), 
+                pdfNum(num(s.kg) * num(s.rate))
+            ]),
+            foot: [['Total Sales', '', '', { content: pdfNum(salesGrand), styles: { halign: 'right' } }]],
+            headStyles: { fillColor: '#0d9488' }, // Teal
+            footStyles: { fillColor: '#f0fdfa', textColor: '#000', fontStyle: 'bold' },
+            didDrawPage: (data) => { y = data.cursor.y; }
+        });
+        y = doc.autoTable.previous.finalY + 10;
+        
+        // --- 2. Arrival Expenses ---
+        const aexpTotal = arrivalExpenses.reduce((s,x)=> s + num(x.amount), 0);
+        doc.autoTable({
+            startY: y,
+            head: [['Arrival Expenses - Item', 'Amount (LKR)']],
+            body: arrivalExpenses.map(e => [e.item, pdfNum(e.amount)]),
+            foot: [['Total Arrival Expenses', { content: pdfNum(aexpTotal), styles: { halign: 'right' } }]],
+            headStyles: { fillColor: '#0d9488' }, // Teal
+            footStyles: { fillColor: '#f0fdfa', textColor: '#000', fontStyle: 'bold' },
+            didDrawPage: (data) => { y = data.cursor.y; }
+        });
+        y = doc.autoTable.previous.finalY + 10;
+
+        // --- 3. Arrival Loans ---
+        const aloanTotal = arrivalLoans.reduce((s,x)=> s + num(x.amount), 0);
+        doc.autoTable({
+            startY: y,
+            head: [['Arrival Loans - Name', 'Amount (LKR)']],
+            body: arrivalLoans.map(l => [l.name, pdfNum(l.amount)]),
+            foot: [['Total Arrival Loans', { content: pdfNum(aloanTotal), styles: { halign: 'right' } }]],
+            headStyles: { fillColor: '#0d9488' }, // Teal
+            footStyles: { fillColor: '#f0fdfa', textColor: '#000', fontStyle: 'bold' },
+            didDrawPage: (data) => { y = data.cursor.y; }
+        });
+        y = doc.autoTable.previous.finalY + 10;
+
+        // --- 4. Summary & Commission ---
+        if (y > 270) {
+            doc.addPage();
+            y = 15;
+        }
+        
+        const commissionRate = num(document.getElementById('commissionRate').value);
+        const commissionAmount = salesGrand * (commissionRate / 100);
+        const netToOwner = salesGrand - aexpTotal - aloanTotal - commissionAmount;
+
+        doc.autoTable({
+            startY: y,
+            head: [['Summary & Commission', 'Amount']],
+            body: [
+                ['Sales Grand Total', { content: pdfFmt(salesGrand), styles: { halign: 'right' } }],
+                ['Arrival Expenses', { content: `-${pdfFmt(aexpTotal)}`, styles: { halign: 'right' } }],
+                ['Loans (Arrival)', { content: `-${pdfFmt(aloanTotal)}`, styles: { halign: 'right' } }],
+                ['Commission Rate (%)', { content: `${commissionRate.toLocaleString()}%`, styles: { halign: 'right' } }],
+                ['Commission Amount', { content: `-${pdfFmt(commissionAmount)}`, styles: { halign: 'right' } }]
+            ],
+            foot: [[
+                { content: 'Net To Owner', styles: { fontStyle: 'bold' } },
+                { content: pdfFmt(netToOwner), styles: { halign: 'right', fontStyle: 'bold' } }
+            ]],
+            headStyles: { fillColor: '#134e4a' }, // Darker Teal
+            footStyles: { fillColor: '#ccfbf1', textColor: '#000', fontStyle: 'bold', fontSize: 12 },
+            theme: 'grid'
+        });
+
+        doc.save(`Arrival_Report_${document.getElementById('arrDate').value}_${document.getElementById('arrBoat').value || 'NoBoat'}.pdf`);
+    } catch(e) {
+        console.error("Error generating PDF:", e);
+        console.warn("Could not generate PDF. Check console for errors.");
+    }
+  }
+  // END: New PDF Export function for Arrival Report
+
 
   /* ======================
      ARRIVAL: FULL SYSTEM
@@ -856,6 +971,7 @@
   window.removeAE = removeAE;
   window.addArrivalLoan = addArrivalLoan;
   window.removeArrivalLoan = removeArrivalLoan;
+  window.exportArrivalPDF = exportArrivalPDF; // <-- Add new function to window
 
   // Basic init
   renderLE();
