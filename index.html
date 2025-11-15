@@ -51,7 +51,7 @@
   <section id="landing" class="">
     <div class="bg-white rounded-lg shadow-xl overflow-hidden">
       <div class="p-6 md:p-10">
-        <h2 class="text-3xl md:text-4xl font-extrabold text-indigo-900 mb-4">Welcome,</h2>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-indigo-900 mb-4">Welcome, !</h2>
         <p class="text-lg text-slate-600 mb-8">Select a report to get started. All your data will be calculated and ready for export.</p>
         
         <!--  -->
@@ -164,9 +164,15 @@
       <!-- Boat Value / Repairs -->
       <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
         <h3 class="text-xl font-semibold mb-4 text-slate-800">Boat Value / Repairs</h3>
+        <!-- START: New Current Boat Value Field -->
+        <div class="mb-4">
+            <label for="boatValue" class="block text-sm font-medium text-slate-700 mb-1">Current Boat Value (LKR)</label>
+            <input type="number" id="boatValue" value="10000000" step="1000" class="w-full md:w-1/2 p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        <!-- END: New Current Boat Value Field -->
         <div class="flex flex-col md:flex-row gap-4 mb-4">
           <input type="text" id="repairDesc" placeholder="e.g., engine service" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
-          <input type="number" id="repairCost" value="0" min="0" step="0.01" placeholder="Cost (LKR)" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
+          <input type="number" id="repairCost" value="0" min="0" step="0.01" placeholder="Additional Repair Cost (LKR)" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
           <button onclick="addRepair()" class="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 transition-colors">Add Repair</button>
         </div>
         <table id="repairTable" class="w-full table-auto">
@@ -174,7 +180,7 @@
           <tbody></tbody>
         </table>
         <div class="flex justify-end items-center gap-4 mt-4">
-          <span class="text-slate-600">Boat Repairs Total:</span>
+          <span class="text-slate-600">Boat Value & Repairs Total:</span>
           <span id="repairsTotal" class="text-xl font-bold text-indigo-900">LKR 0.00</span>
         </div>
       </div>
@@ -238,11 +244,13 @@
       <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg">
         <h3 class="text-xl font-semibold mb-4 text-slate-800">Departure Totals</h3>
         <div class="space-y-2">
-          <div class="flex justify-between items-center"><span class="text-slate-600">Loading Expenses</span><span id="summary_le" class="font-medium text-slate-800">LKR 0.00</span></div>
+          <!-- START: Re-ordered and Re-titled Summary -->
+          <div class="flex justify-between items-center"><span class="text-slate-600">Boat Loading cost</span><span id="summary_le" class="font-medium text-slate-800">LKR 0.00</span></div>
+          <div class="flex justify-between items-center"><span class="text-slate-600">Total Due Loans</span><span id="summary_loans" class="font-medium text-slate-800">LKR 0.00</span></div>
+          <div class="flex justify-between items-center"><span class="text-slate-600">Current Value of the Boat</span><span id="summary_repairs" class="font-medium text-slate-800">LKR 0.00</span></div>
           <div class="flex justify-between items-center"><span class="text-slate-600">Diesel</span><span id="summary_diesel" class="font-medium text-slate-800">LKR 0.00</span></div>
-          <div class="flex justify-between items-center"><span class="text-slate-600">Boat Repairs</span><span id="summary_repairs" class="font-medium text-slate-800">LKR 0.00</span></div>
           <div class="flex justify-between items-center"><span class="text-slate-600">Salary</span><span id="summary_salary" class="font-medium text-slate-800">LKR 0.00</span></div>
-          <div class="flex justify-between items-center"><span class="text-slate-600">Total Loans</span><span id="summary_loans" class="font-medium text-slate-800">LKR 0.00</span></div>
+          <!-- END: Re-ordered and Re-titled Summary -->
         </div>
         <div class="flex justify-between items-center mt-4 pt-4 border-t border-indigo-200">
           <span class="text-xl font-bold text-indigo-900">Total Amount (LKR)</span>
@@ -451,7 +459,9 @@
   function renderRepairs(){
     const tbody = document.querySelector('#repairTable tbody');
     tbody.innerHTML = '';
-    let total = 0;
+    // START: Get base boat value and add it to the total
+    let total = num(document.getElementById('boatValue').value);
+    // END: Get base boat value
     repairs.forEach((r, i) => {
       total += num(r.cost);
       const tr = tbody.insertRow();
@@ -471,6 +481,9 @@
     renderRepairs();
   }
   function removeRepair(i){ repairs.splice(i,1); renderRepairs(); }
+  // START: Add event listener for the new boat value input
+  document.getElementById('boatValue').addEventListener('input', renderRepairs);
+  // END: Add event listener
 
   /* ----------------------
      DEPARTURE: Salary (NEW)
@@ -595,21 +608,71 @@
         y += 8;
         
         const pdfNum = (v) => num(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-
-        // --- Loading Expenses ---
+        
+        // START: Re-ordered PDF sections
+        
+        // --- 1. Boat Loading cost ---
         const leTotal = loadingExpenses.reduce((s,x)=>s+num(x.amount),0);
         doc.autoTable({
             startY: y,
-            head: [['Loading Expenses - Item', 'Amount (LKR)']],
+            head: [['Boat Loading cost - Item', 'Amount (LKR)']],
             body: loadingExpenses.map(it => [it.item, pdfNum(it.amount)]),
-            foot: [['Total Loading Expenses', { content: pdfNum(leTotal), styles: { halign: 'right' } }]],
+            foot: [['Total Loading cost', { content: pdfNum(leTotal), styles: { halign: 'right' } }]],
             headStyles: { fillColor: '#0b66c3' },
             footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
             didDrawPage: (data) => { y = data.cursor.y; }
         });
         y = doc.autoTable.previous.finalY + 10;
 
-        // --- Diesel ---
+        // --- 2. Total Due Loans ---
+        const loanTotal = currentLoans.reduce((s,x)=>s+num(x.amount),0) + previousLoans.reduce((s,x)=>s+num(x.amount),0);
+        let loanBody = [];
+        if (currentLoans.length > 0) {
+            loanBody.push([{ content: 'Current Loans', colSpan: 2, styles: { fontStyle: 'bold', fillColor: '#f9f9f9' } }]);
+            currentLoans.forEach(l => loanBody.push([l.name, pdfNum(l.amount)]));
+        }
+        if (previousLoans.length > 0) {
+            loanBody.push([{ content: 'Previous Loans', colSpan: 2, styles: { fontStyle: 'bold', fillColor: '#f9f9f9' } }]);
+            previousLoans.forEach(l => loanBody.push([l.name, pdfNum(l.amount)]));
+        }
+        if (loanBody.length === 0) {
+            loanBody.push([[{content: 'No loans reported.', colSpan: 2, styles: { halign: 'center' }}]]);
+        }
+        
+        doc.autoTable({
+            startY: y,
+            head: [['Total Due Loans - Name', 'Amount (LKR)']],
+            body: loanBody,
+            foot: [['Total Loans', { content: pdfNum(loanTotal), styles: { halign: 'right' } }]],
+            headStyles: { fillColor: '#0b66c3' },
+            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
+            didDrawPage: (data) => { y = data.cursor.y; }
+        });
+        y = doc.autoTable.previous.finalY + 10;
+        
+        // --- 3. Current Value of the Boat ---
+        const boatValue = num(document.getElementById('boatValue').value);
+        const repairsTotal = boatValue + repairs.reduce((s,x)=>s+num(x.cost),0);
+        let repairBody = [
+            [{ content: 'Current Boat Value', styles: { fontStyle: 'bold' } }, { content: pdfNum(boatValue), styles: { halign: 'right' } }]
+        ];
+        if (repairs.length > 0) {
+             repairBody.push([{ content: 'Additional Repairs', colSpan: 2, styles: { fontStyle: 'bold', fillColor: '#f9f9f9' } }]);
+             repairs.forEach(r => repairBody.push([r.desc, pdfNum(r.cost)]));
+        }
+
+        doc.autoTable({
+            startY: y,
+            head: [['Current Value of the Boat', 'Amount (LKR)']],
+            body: repairBody,
+            foot: [['Total Boat Value & Repairs', { content: pdfNum(repairsTotal), styles: { halign: 'right' } }]],
+            headStyles: { fillColor: '#0b66c3' },
+            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
+            didDrawPage: (data) => { y = data.cursor.y; }
+        });
+        y = doc.autoTable.previous.finalY + 10;
+
+        // --- 4. Diesel ---
         const dieselLiters = num(document.getElementById('dieselLiters').value);
         const dieselRate = num(document.getElementById('dieselRate').value);
         const dieselTotal = dieselLiters * dieselRate;
@@ -627,20 +690,7 @@
         });
         y = doc.autoTable.previous.finalY + 10;
 
-        // --- Boat Repairs ---
-        const repairsTotal = repairs.reduce((s,x)=>s+num(x.cost),0);
-        doc.autoTable({
-            startY: y,
-            head: [['Boat Repairs - Description', 'Cost (LKR)']],
-            body: repairs.map(r => [r.desc, pdfNum(r.cost)]),
-            foot: [['Total Boat Repairs', { content: pdfNum(repairsTotal), styles: { halign: 'right' } }]],
-            headStyles: { fillColor: '#0b66c3' },
-            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
-            didDrawPage: (data) => { y = data.cursor.y; }
-        });
-        y = doc.autoTable.previous.finalY + 10;
-
-        // --- Salary ---
+        // --- 5. Salary ---
         const salaryTotal = salaries.reduce((s,x)=>s+num(x.amount),0);
         doc.autoTable({
             startY: y,
@@ -652,44 +702,35 @@
             didDrawPage: (data) => { y = data.cursor.y; }
         });
         y = doc.autoTable.previous.finalY + 10;
-
-        // --- Loans ---
-        const loanTotal = currentLoans.reduce((s,x)=>s+num(x.amount),0) + previousLoans.reduce((s,x)=>s+num(x.amount),0);
-        let loanBody = [];
-        if (currentLoans.length > 0) {
-            loanBody.push([{ content: 'Current Loans', colSpan: 2, styles: { fontStyle: 'bold', fillColor: '#f9f9f9' } }]);
-            currentLoans.forEach(l => loanBody.push([l.name, pdfNum(l.amount)]));
-        }
-        if (previousLoans.length > 0) {
-            loanBody.push([{ content: 'Previous Loans', colSpan: 2, styles: { fontStyle: 'bold', fillColor: '#f9f9f9' } }]);
-            previousLoans.forEach(l => loanBody.push([l.name, pdfNum(l.amount)]));
-        }
-        if (loanBody.length === 0) {
-            loanBody.push([[{content: 'No loans reported.', colSpan: 2, styles: { halign: 'center' }}]]);
-        }
         
-        doc.autoTable({
-            startY: y,
-            head: [['Loans - Name', 'Amount (LKR)']],
-            body: loanBody,
-            foot: [['Total Loans', { content: pdfNum(loanTotal), styles: { halign: 'right' } }]],
-            headStyles: { fillColor: '#0b66c3' },
-            footStyles: { fillColor: '#f2f8ff', textColor: '#000', fontStyle: 'bold' },
-            didDrawPage: (data) => { y = data.cursor.y; }
-        });
-        y = doc.autoTable.previous.finalY + 10;
+        // --- END: Re-ordered PDF sections ---
 
 
-        // --- Grand Total ---
+        // --- Grand Total Summary Table ---
         if (y > 270) {
             doc.addPage();
             y = 15;
         }
         
-        doc.setFontSize(16);
-        doc.setFont(undefined, 'bold');
-        doc.text("Departure Grand Total:", margin, y);
-        doc.text(document.getElementById('departureGrand').textContent, rightMargin, y, { align: 'right' });
+        const grandTotal = leTotal + loanTotal + repairsTotal + dieselTotal + salaryTotal;
+        doc.autoTable({
+            startY: y,
+            head: [['Final Summary', 'Total (LKR)']],
+            body: [
+                ['Boat Loading cost', { content: pdfNum(leTotal), styles: { halign: 'right' } }],
+                ['Total Due Loans', { content: pdfNum(loanTotal), styles: { halign: 'right' } }],
+                ['Current Value of the Boat', { content: pdfNum(repairsTotal), styles: { halign: 'right' } }],
+                ['Diesel', { content: pdfNum(dieselTotal), styles: { halign: 'right' } }],
+                ['Salary', { content: pdfNum(salaryTotal), styles: { halign: 'right' } }]
+            ],
+            foot: [[
+                { content: 'Total Amount (LKR)', styles: { fontStyle: 'bold' } },
+                { content: pdfNum(grandTotal), styles: { halign: 'right', fontStyle: 'bold' } }
+            ]],
+            headStyles: { fillColor: '#4338ca' }, // Darker indigo
+            footStyles: { fillColor: '#e0e7ff', textColor: '#000', fontStyle: 'bold', fontSize: 12 },
+            theme: 'grid'
+        });
 
         doc.save(`Departure_Report_${document.getElementById('depDate').value}_${document.getElementById('depBoat').value || 'NoBoat'}.pdf`);
     } catch(e) {
