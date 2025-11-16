@@ -248,21 +248,40 @@
         </div>
       </div>
 
-      <!-- Departure Totals -->
+      <!-- Departure Totals (MODIFIED) -->
       <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg">
-        <h3 class="text-xl font-semibold mb-4 text-slate-800">Departure Totals</h3>
-        <div class="space-y-2">
-          <div class="flex justify-between items-center"><span class="text-slate-600">Boat Loading cost</span><span id="summary_le" class="font-medium text-slate-800">LKR 0.00</span></div>
-          <div class="flex justify-between items-center"><span class="text-slate-600">Total Due Loans</span><span id="summary_loans" class="font-medium text-slate-800">LKR 0.00</span></div>
-          <div class="flex justify-between items-center"><span class="text-slate-600">Current Value of the Boat</span><span id="summary_repairs" class="font-medium text-slate-800">LKR 0.00</span></div>
-          <div class="flex justify-between items-center"><span class="text-slate-600">Diesel</span><span id="summary_diesel" class="font-medium text-slate-800">LKR 0.00</span></div>
-          <div class="flex justify-between items-center"><span class="text-slate-600">Salary</span><span id="summary_salary" class="font-medium text-slate-800">LKR 0.00</span></div>
+        <h3 class="text-xl font-semibold mb-4 text-slate-800">Departure Summary</h3>
+        
+        <!-- New Summary Section -->
+        <div class="space-y-3 mt-4">
+          <div class="flex justify-between items-center">
+            <span class="text-lg text-slate-700">Boat Loading cost</span>
+            <span id="summary_le" class="text-blue-700 text-lg font-semibold">LKR 0.00</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-lg text-slate-700">Diesel</span>
+            <span id="summary_diesel" class="text-blue-700 text-lg font-semibold">LKR 0.00</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-lg text-slate-700">Total Due Loans</span>
+            <span id="summary_loans" class="text-blue-700 text-lg font-semibold">LKR 0.00</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-lg text-slate-700">Current Value of the Boat</span>
+            <span id="summary_repairs" class="text-blue-700 text-lg font-semibold">LKR 0.00</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-lg text-slate-700">Salary</span>
+            <span id="summary_salary" class="text-blue-700 text-lg font-semibold">LKR 0.00</span>
+          </div>
         </div>
-        <div class="flex justify-between items-center mt-4 pt-4 border-t border-indigo-200">
-          <span class="text-xl font-bold text-indigo-900">Total Departure Costs (LKR)</span>
-          <span id="departureGrand" class="text-2xl font-extrabold text-indigo-900">LKR 0.00</span>
+        
+        <!-- New Note Section -->
+        <div class="mt-6">
+          <label for="depNotes" class="block text-sm font-medium text-slate-700 mb-1">Notes</label>
+          <textarea id="depNotes" rows="3" placeholder="Add any notes for the report..." class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
         </div>
-        <p class="text-xs text-slate-500 mt-2">* Total Departure Costs = Loading + Loans + Diesel + Salary + Additional Repairs (does not include boat value).</p>
+        
       </div>
 
       <!-- PDF Export Button -->
@@ -440,7 +459,7 @@
     });
     document.getElementById('leTotal').textContent = fmt(total);
     document.getElementById('summary_le').textContent = fmt(total);
-    updateDepartureGrand();
+    updateDepartureGrand(); // Still need to update summaries
   }
   function addLoadingExpense(){
     const item = document.getElementById('leItem').value.trim();
@@ -461,7 +480,7 @@
     const total = liters * rate;
     document.getElementById('dieselTotal').textContent = fmt(total);
     document.getElementById('summary_diesel').textContent = fmt(total);
-    updateDepartureGrand();
+    updateDepartureGrand(); // Still need to update summaries
   }
   document.getElementById('dieselLiters').addEventListener('input', updateDiesel);
   document.getElementById('dieselRate').addEventListener('input', updateDiesel);
@@ -482,7 +501,7 @@
     });
     document.getElementById('repairsTotal').textContent = fmt(total);
     document.getElementById('summary_repairs').textContent = fmt(total);
-    updateDepartureGrand();
+    updateDepartureGrand(); // Still need to update summaries
   }
   function addRepair(){
     const desc = document.getElementById('repairDesc').value.trim();
@@ -511,7 +530,7 @@
     });
     document.getElementById('salaryTotal').textContent = fmt(total);
     document.getElementById('summary_salary').textContent = fmt(total);
-    updateDepartureGrand();
+    updateDepartureGrand(); // Still need to update summaries
   }
   function addSalary(){
     const name = document.getElementById('salaryName').value.trim();
@@ -553,7 +572,7 @@
     const loanTotal = curTotal + prevTotal;
     document.getElementById('loanTotal').textContent = fmt(loanTotal);
     document.getElementById('summary_loans').textContent = fmt(loanTotal); // Update summary
-    updateDepartureGrand();
+    updateDepartureGrand(); // Still need to update summaries
   }
   function addLoan(which){
     if(which === 'current'){
@@ -580,24 +599,25 @@
   /* ----------------------
      DEPARTURE: Grand total
      ---------------------- */
-  // START: Corrected Grand Total Calculation
+  // This function now just updates the summary fields. The grand total UI is removed.
   function updateDepartureGrand(){
     const leTotal = loadingExpenses.reduce((s,x)=>s+num(x.amount),0);
-    const dieselTotal = num(document.getElementById('dieselLiters').value) * num(document.getElementById('dieselRate').value);
-    // This is ONLY the cost of *new* repairs, not the boat value
+    const dieselTotalVal = num(document.getElementById('dieselLiters').value) * num(document.getElementById('dieselRate').value);
+    const boatValue = num(document.getElementById('boatValue').value);
     const repairsOnlyTotal = repairs.reduce((s,x)=>s+num(x.cost),0); 
-    const salaryTotal = salaries.reduce((s,x)=>s+num(x.amount),0);
-    const loanTotal = currentLoans.reduce((s,x)=>s+num(x.amount),0) + previousLoans.reduce((s,x)=>s+num(x.amount),0);
+    const salaryTotalVal = salaries.reduce((s,x)=>s+num(x.amount),0);
+    const loanTotalVal = currentLoans.reduce((s,x)=>s+num(x.amount),0) + previousLoans.reduce((s,x)=>s+num(x.amount),0);
     
-    // Grand total is the sum of COSTS
-    const grand = leTotal + dieselTotal + repairsOnlyTotal + salaryTotal + loanTotal;
-    
-    document.getElementById('departureGrand').textContent = fmt(grand);
+    // Update summary fields
+    document.getElementById('summary_le').textContent = fmt(leTotal);
+    document.getElementById('summary_diesel').textContent = fmt(dieselTotalVal);
+    document.getElementById('summary_loans').textContent = fmt(loanTotalVal);
+    document.getElementById('summary_repairs').textContent = fmt(boatValue + repairsOnlyTotal); // This is Boat Value + Repairs
+    document.getElementById('summary_salary').textContent = fmt(salaryTotalVal);
   }
-  // END: Corrected Grand Total Calculation
 
   /* ----------------------
-     DEPARTURE: PDF Export (NEW SINGLE TABLE)
+     DEPARTURE: PDF Export (MODIFIED)
      ---------------------- */
   function exportDeparturePDF() {
       try {
@@ -627,11 +647,9 @@
         const rightAlign = { halign: 'right' };
         
         let reportBody = [];
-        let totalCosts = 0;
 
         // --- 1. Boat Loading cost ---
         const leTotal = loadingExpenses.reduce((s,x)=>s+num(x.amount),0);
-        totalCosts += leTotal;
         reportBody.push([{ content: 'Boat Loading cost', colSpan: 2, styles: sectionHeaderStyles }]);
         if(loadingExpenses.length > 0) {
           loadingExpenses.forEach(it => reportBody.push([it.item, { content: pdfNum(it.amount), styles: rightAlign }]));
@@ -644,7 +662,6 @@
         const curLoanTotal = currentLoans.reduce((s,x)=>s+num(x.amount),0);
         const prevLoanTotal = previousLoans.reduce((s,x)=>s+num(x.amount),0);
         const loanTotal = curLoanTotal + prevLoanTotal;
-        totalCosts += loanTotal;
         reportBody.push([{ content: 'Total Due Loans', colSpan: 2, styles: sectionHeaderStyles }]);
         if (currentLoans.length > 0) {
             reportBody.push([{ content: 'Current Loans', colSpan: 2, styles: { fontStyle: 'italic', fillColor: '#f9fafb' } }]);
@@ -663,7 +680,6 @@
         const boatValue = num(document.getElementById('boatValue').value);
         const repairsOnlyTotal = repairs.reduce((s,x)=>s+num(x.cost),0);
         const repairsTotalWithValue = boatValue + repairsOnlyTotal;
-        totalCosts += repairsOnlyTotal; // Only add the *cost* of new repairs to the grand total
         
         reportBody.push([{ content: 'Current Value of the Boat', colSpan: 2, styles: sectionHeaderStyles }]);
         reportBody.push([
@@ -683,7 +699,6 @@
         const dieselLiters = num(document.getElementById('dieselLiters').value);
         const dieselRate = num(document.getElementById('dieselRate').value);
         const dieselTotal = dieselLiters * dieselRate;
-        totalCosts += dieselTotal;
         reportBody.push([{ content: 'Diesel', colSpan: 2, styles: sectionHeaderStyles }]);
         reportBody.push(['Liters', { content: pdfNum(dieselLiters) + ' L', styles: rightAlign }]);
         reportBody.push(['Rate (LKR / litre)', { content: pdfNum(dieselRate), styles: rightAlign }]);
@@ -691,7 +706,6 @@
 
         // --- 5. Salary ---
         const salaryTotal = salaries.reduce((s,x)=>s+num(x.amount),0);
-        totalCosts += salaryTotal;
         reportBody.push([{ content: 'Salary', colSpan: 2, styles: sectionHeaderStyles }]);
         if(salaries.length > 0) {
           salaries.forEach(s => reportBody.push([s.name, { content: pdfNum(s.amount), styles: rightAlign }]));
@@ -705,15 +719,59 @@
             startY: y,
             head: [['Departure Report Details', 'Amount (LKR)']],
             body: reportBody,
-            foot: [[
-                { content: 'Total Departure Costs (LKR)', styles: { fontStyle: 'bold', fontSize: 12 } },
-                { content: pdfNum(totalCosts), styles: { halign: 'right', fontStyle: 'bold', fontSize: 12 } }
-            ]],
+            // FOOTER REMOVED as requested
             headStyles: { fillColor: '#4338ca' }, // Darker indigo
-            footStyles: { fillColor: '#e0e7ff', textColor: '#000' },
             theme: 'grid',
             didDrawPage: (data) => { y = data.cursor.y; }
         });
+        
+        // --- NEW: Add Summary Table ---
+        y = doc.autoTable.previous.finalY + 10; // Get y from previous table
+
+        const summaryBody = [
+          ['Boat Loading cost', { content: pdfNum(leTotal), styles: rightAlign }],
+          ['Diesel', { content: pdfNum(dieselTotal), styles: rightAlign }],
+          ['Total Due Loans', { content: pdfNum(loanTotal), styles: rightAlign }],
+          ['Current Value of the Boat', { content: pdfNum(repairsTotalWithValue), styles: rightAlign }], // This is summary_repairs
+          ['Salary', { content: pdfNum(salaryTotal), styles: rightAlign }]
+        ];
+        
+        doc.autoTable({
+            startY: y,
+            head: [['Departure Summary', 'Amount (LKR)']],
+            body: summaryBody,
+            headStyles: { fillColor: '#4338ca' }, // Indigo
+            bodyStyles: {
+                fontStyle: 'bold',
+                textColor: '#0000FF', // Blue
+                fontSize: 11 // Slightly larger than default 10
+            },
+            theme: 'grid',
+            didDrawPage: (data) => { y = data.cursor.y; }
+        });
+        
+        // --- NEW: Add Notes to PDF ---
+        y = doc.autoTable.previous.finalY + 10; // Get y from summary table
+        const notes = document.getElementById('depNotes').value;
+        
+        if (y > 260) { // Check if new page is needed for notes
+             doc.addPage();
+             y = 15;
+        }
+
+        if (notes.trim() !== '') {
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text("Notes:", margin, y);
+            y += 6;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            // Use splitTextToSize for auto-wrapping
+            const wrappedNotes = doc.splitTextToSize(notes, rightMargin - margin); 
+            doc.text(wrappedNotes, margin, y);
+            y += (wrappedNotes.length * 4) + 5; // Adjust y based on note length
+        }
+
 
         doc.save(`Departure_Report_${document.getElementById('depDate').value}_${document.getElementById('depBoat').value || 'NoBoat'}.pdf`);
     } catch(e) {
