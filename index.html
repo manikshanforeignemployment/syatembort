@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Manikshan Boat Report System</title>
-<!-- Tailwind CSS -->
+<!-- Tailwind CSS for modern styling -->
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- jspdf libraries for PDF export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -20,16 +20,6 @@
   table th {
     background-color: #f9fafb; /* tailwind gray-50 */
     font-weight: 600;
-  }
-  /* Custom class for PDF table section headers */
-  .pdf-section-header {
-    font-weight: bold;
-    font-size: 12px;
-    background-color: #f3f4f6;
-  }
-  /* Custom class for PDF table sub-totals */
-  .pdf-section-total {
-    font-weight: bold;
   }
 </style>
 <script>
@@ -57,13 +47,11 @@
 
   <!-- ======================
        DEPARTURE REPORT SECTION
-       (This is now the only section)
        ====================== -->
   <section id="departure" class="">
     <!-- Header -->
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-3xl font-bold text-indigo-900">Departure Report</h2>
-      <!-- Back button removed -->
     </div>
 
     <!-- Date & Boat -->
@@ -87,12 +75,11 @@
         <h3 class="text-xl font-semibold mb-4 text-slate-800">Loading Expenses</h3>
         <div class="flex flex-col md:flex-row gap-4 mb-4">
           <input type="text" id="leItem" placeholder="Item description (e.g., loading labour)" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
-          <!-- MODIFIED: type="text" with formatting events -->
-          <input type="text" id="lePrice" placeholder="Price (LKR 0.00)" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event)" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
-          <button onclick="addLoadingExpense()" class="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 transition-colors">Add Cost</button>
+          <input type="text" id="lePrice" placeholder="Price (LKR 0.00)" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event); updateDiesel();" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
+          <button onclick="handleLEAction()" id="leActionBtn" class="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 transition-colors">Add Cost</button>
         </div>
         <table id="leTable" class="w-full table-auto">
-          <thead><tr><th>Item</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
+          <thead><tr><th>Item</th><th class="right">Amount (LKR)</th><th class="w-40">Actions</th></tr></thead>
           <tbody></tbody>
         </table>
         <div class="flex justify-end items-center gap-4 mt-4">
@@ -107,13 +94,11 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label for="dieselLiters" class="block text-sm font-medium text-slate-700 mb-1">Liters</label>
-            <!-- MODIFIED: type="text" with formatting events -->
-            <input type="text" id="dieselLiters" value="0" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event)" class="w-full p-2 border border-slate-300 rounded-md shadow-sm">
+            <input type="text" id="dieselLiters" value="0" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event); saveDataToLocalStorage();" oninput="updateDiesel()" class="w-full p-2 border border-slate-300 rounded-md shadow-sm">
           </div>
           <div>
             <label for="dieselRate" class="block text-sm font-medium text-slate-700 mb-1">Rate (LKR / litre)</label>
-            <!-- MODIFIED: type="text" with formatting events -->
-            <input type="text" id="dieselRate" value="277" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event)" class="w-full p-2 border border-slate-300 rounded-md shadow-sm">
+            <input type="text" id="dieselRate" value="277" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event); saveDataToLocalStorage();" oninput="updateDiesel()" class="w-full p-2 border border-slate-300 rounded-md shadow-sm">
           </div>
         </div>
         <div class="flex justify-end items-center gap-4 mt-4">
@@ -127,17 +112,15 @@
         <h3 class="text-xl font-semibold mb-4 text-slate-800">Boat Value / Repairs</h3>
         <div class="mb-4">
             <label for="boatValue" class="block text-sm font-medium text-slate-700 mb-1">Current Boat Value (LKR)</label>
-            <!-- MODIFIED: type="text" with formatting events -->
-            <input type="text" id="boatValue" value="10000000" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event)" class="w-full md:w-1/2 p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <input type="text" id="boatValue" value="10000000" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event); saveDataToLocalStorage();" oninput="renderRepairs()" class="w-full md:w-1/2 p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
         </div>
         <div class="flex flex-col md:flex-row gap-4 mb-4">
           <input type="text" id="repairDesc" placeholder="e.g., engine service" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
-          <!-- MODIFIED: type="text" with formatting events -->
-          <input type="text" id="repairCost" placeholder="Repair Cost (LKR 0.00)" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event)" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
-          <button onclick="addRepair()" class="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 transition-colors">Add Repair</button>
+          <input type="text" id="repairCost" placeholder="Repair Cost (LKR 0.00)" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event); updateDiesel();" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
+          <button onclick="handleRepairAction()" id="repairActionBtn" class="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 transition-colors">Add Repair</button>
         </div>
         <table id="repairTable" class="w-full table-auto">
-          <thead><tr><th>Description</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
+          <thead><tr><th>Description</th><th class="right">Amount (LKR)</th><th class="w-40">Actions</th></tr></thead>
           <tbody></tbody>
         </table>
         <div class="flex justify-end items-center gap-4 mt-4">
@@ -148,19 +131,18 @@
 
       <!-- Salaries -->
       <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold mb-4 text-slate-800">Salaries</h3>
+        <h3 class="text-xl font-semibold mb-4 text-slate-800">Salaries / wages</h3>
         <div class="flex flex-col md:flex-row gap-4 mb-4">
           <input type="text" id="salaryName" placeholder="Employee/Staff Name" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
-          <!-- MODIFIED: type="text" with formatting events -->
-          <input type="text" id="salaryAmount" placeholder="Amount (LKR 0.00)" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event)" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
-          <button onclick="addSalaries()" class="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 transition-colors">Add Salary</button>
+          <input type="text" id="salaryAmount" placeholder="Amount (LKR 0.00)" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event); updateDiesel();" class="md:w-48 p-2 border border-slate-300 rounded-md shadow-sm">
+          <button onclick="handleSalaryAction()" id="salaryActionBtn" class="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 transition-colors">Add Salary</button>
         </div>
         <table id="salaryTable" class="w-full table-auto">
-          <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
+          <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-40">Actions</th></tr></thead>
           <tbody></tbody>
         </table>
         <div class="flex justify-end items-center gap-4 mt-4">
-          <span class="text-slate-600">Salaries Total:</span>
+          <span class="text-slate-600">Salaries / wages Total:</span>
           <span id="salaryTotal" class="text-xl font-bold text-indigo-900">LKR 0.00</span>
         </div>
       </div>
@@ -174,12 +156,11 @@
             <label class="block text-sm font-semibold text-slate-700 mb-2">Current Loans</label>
             <div class="flex flex-col md:flex-row gap-2 mb-3">
               <input type="text" id="curLoanName" placeholder="Name" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
-              <!-- MODIFIED: type="text" with formatting events -->
-              <input type="text" id="curLoanAmount" placeholder="LKR 0.00" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event)" class="md:w-32 p-2 border border-slate-300 rounded-md shadow-sm">
-              <button onclick="addLoan('current')" class="bg-indigo-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-600 transition-colors">Add</button>
+              <input type="text" id="curLoanAmount" placeholder="LKR 0.00" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event); updateDiesel();" class="md:w-32 p-2 border border-slate-300 rounded-md shadow-sm">
+              <button onclick="handleLoanAction('current')" id="curLoanActionBtn" class="bg-indigo-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-600 transition-colors">Add</button>
             </div>
             <table id="curLoanTable" class="w-full table-auto">
-              <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
+              <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-40">Actions</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -188,12 +169,11 @@
             <label class="block text-sm font-semibold text-slate-700 mb-2">Previous Loans</label>
             <div class="flex flex-col md:flex-row gap-2 mb-3">
               <input type="text" id="prevLoanName" placeholder="Name" class="flex-grow p-2 border border-slate-300 rounded-md shadow-sm">
-              <!-- MODIFIED: type="text" with formatting events -->
-              <input type="text" id="prevLoanAmount" placeholder="LKR 0.00" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event)" class="md:w-32 p-2 border border-slate-300 rounded-md shadow-sm">
-              <button onclick="addLoan('previous')" class="bg-indigo-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-600 transition-colors">Add</button>
+              <input type="text" id="prevLoanAmount" placeholder="LKR 0.00" inputmode="decimal" onfocus="unformatInput(event)" onblur="formatInput(event); updateDiesel();" class="md:w-32 p-2 border border-slate-300 rounded-md shadow-sm">
+              <button onclick="handleLoanAction('previous')" id="prevLoanActionBtn" class="bg-indigo-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-600 transition-colors">Add</button>
             </div>
             <table id="prevLoanTable" class="w-full table-auto">
-              <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-24">Action</th></tr></thead>
+              <thead><tr><th>Name</th><th class="right">Amount (LKR)</th><th class="w-40">Actions</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -204,11 +184,11 @@
         </div>
       </div>
 
-      <!-- Departure Totals (MODIFIED) -->
+      <!-- Departure Totals -->
       <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg">
         <h3 class="text-xl font-semibold mb-4 text-slate-800">Departure Summary</h3>
         
-        <!-- New Summary Section -->
+        <!-- Summary Section -->
         <div class="space-y-3 mt-4">
           <div class="flex justify-between items-center">
             <span class="text-lg text-slate-700">Boat Loading cost</span>
@@ -232,7 +212,7 @@
           </div>
         </div>
         
-        <!-- New Note Section -->
+        <!-- Notes Section -->
         <div class="mt-6">
           <label for="depNotes" class="block text-sm font-medium text-slate-700 mb-1">Notes</label>
           <textarea id="depNotes" rows="3" placeholder="Add any notes for the report..." class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
@@ -240,17 +220,18 @@
         
       </div>
 
-      <!-- PDF Export Button -->
-      <div class="text-right mt-6">
+      <!-- PDF Export and Clear Button -->
+      <div class="flex justify-end gap-4 mt-6">
+          <!-- Clear All Data Button -->
+          <button onclick="clearAllDataAndUI()" class="bg-red-600 text-white px-6 py-3 rounded-md shadow-lg hover:bg-red-700 transition-all font-semibold text-lg">
+            Clear All Data
+          </button>
           <button onclick="exportDeparturePDF()" class="bg-green-600 text-white px-6 py-3 rounded-md shadow-lg hover:bg-green-700 transition-all font-semibold text-lg">
             Export Departure Report (PDF)
           </button>
       </div>
     </div>
   </section>
-
-  <!-- Arrival Section Removed -->
-
 </main>
 
 <footer class="text-center p-6 text-slate-500 text-sm">
@@ -258,53 +239,261 @@
 </footer>
 
 <script>
-  // Initialize default dates to today
-  const today = new Date().toISOString().slice(0,10);
-  document.getElementById('depDate').value = today;
-  // arrDate removed
+  // --- Global State Variables ---
+  let loadingExpenses = [];
+  let repairs = [];
+  let salaries = [];
+  let currentLoans = [];
+  let previousLoans = [];
 
-  // showSection function removed
+  const STORAGE_KEY = 'manikshan_report_data';
+  
+  // List of simple input fields that need persistence
+  const PERSISTENT_INPUT_IDS = [
+    'depDate', 'depBoat', 'dieselLiters', 'dieselRate', 'boatValue', 'depNotes'
+  ];
+
+  // Global editing state to track which item is being modified
+  let editingState = { array: null, index: -1 };
 
   // Utility formatting
   function fmt(v){ return 'LKR ' + Number(v || 0).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
-  // MODIFIED: num() now strips commas and other non-numeric characters
+  // Strips commas and other non-numeric characters (retains decimals)
   function num(v){ return Number(String(v || 0).replace(/[^0-9.-]+/g,"")); }
   
-  // NEW: Functions to format number inputs on blur/focus
-  function formatInput(e) {
-    // Parse the number, stripping all non-numeric chars
-    const val = num(e.target.value); 
-    if (!isNaN(val) && val !== 0) {
-      // Format with commas, max 2 decimal places
-      e.target.value = val.toLocaleString(undefined, { maximumFractionDigits: 2 });
-    } else {
-      e.target.value = ''; // Clear if invalid or zero
+  // Custom non-blocking message box for success/info 
+  function showUIMessage(message, type = 'success') {
+    const header = document.querySelector('h2.text-3xl.font-bold.text-indigo-900');
+    let bgColor, borderColor, textColor;
+
+    if (type === 'success') {
+        bgColor = 'bg-green-100';
+        borderColor = 'border-green-500';
+        textColor = 'text-green-700';
+    } else if (type === 'error') {
+        bgColor = 'bg-red-100';
+        borderColor = 'border-red-500';
+        textColor = 'text-red-700';
+    } else { // info
+        bgColor = 'bg-blue-100';
+        borderColor = 'border-blue-500';
+        textColor = 'text-blue-700';
     }
+    
+    const messageEl = document.createElement('div');
+    messageEl.className = `p-3 mb-4 ${bgColor} border-l-4 ${borderColor} ${textColor} rounded shadow-md transition-opacity duration-300`;
+    messageEl.textContent = message;
+    messageEl.style.opacity = 1;
+
+    header.parentNode.insertBefore(messageEl, header.nextSibling);
+
+    setTimeout(() => messageEl.style.opacity = 0, 3000);
+    setTimeout(() => messageEl.remove(), 3500); // Remove element after transition
   }
 
-  function unformatInput(e) {
-    // Parse the number, stripping all non-numeric chars
-    const val = num(e.target.value); 
-    if (val !== 0) {
-      e.target.value = val; // Set to raw number for editing
-    } else {
-      e.target.value = ''; // Clear if zero
-    }
-  }
+  // --- UI UTILITIES FOR TABLES ---
 
-  // Custom styled remove button
+  // Custom styled remove button for tables
   function createRemoveButton(onClickFunction) {
       const btn = document.createElement('button');
-      btn.className = "bg-red-100 text-red-700 px-3 py-1 rounded-md text-sm hover:bg-red-200 transition-colors";
+      btn.className = "bg-red-100 text-red-700 px-3 py-1 rounded-md text-sm hover:bg-red-200 transition-colors mr-2";
       btn.textContent = 'Remove';
       btn.onclick = onClickFunction;
       return btn;
   }
+  
+  // Custom styled edit button for tables
+  function createEditButton(onClickFunction) {
+      const btn = document.createElement('button');
+      btn.className = "bg-yellow-100 text-yellow-700 px-3 py-1 rounded-md text-sm hover:bg-yellow-200 transition-colors";
+      btn.textContent = 'Edit';
+      btn.onclick = onClickFunction;
+      return btn;
+  }
+
+  // Resets the action button from 'Save Edit' back to 'Add ...'
+  function resetEditState(buttonId, originalText, clearInputs = true) {
+      editingState = { array: null, index: -1 };
+      
+      const btn = document.getElementById(buttonId);
+      if (btn) {
+          btn.textContent = originalText;
+          btn.classList.remove('bg-green-600', 'hover:bg-green-700', 'bg-indigo-500', 'hover:bg-indigo-600');
+          
+          // Re-apply original color (indigo-600 for main, indigo-500 for loans)
+          if (buttonId.includes('Loan')) {
+              btn.classList.add('bg-indigo-500', 'hover:bg-indigo-600');
+          } else {
+              btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+          }
+      }
+      
+      // Clear all list input fields
+      if (clearInputs) {
+          document.getElementById('leItem').value = '';
+          document.getElementById('lePrice').value = '';
+          document.getElementById('repairDesc').value = '';
+          document.getElementById('repairCost').value = '';
+          document.getElementById('salaryName').value = '';
+          document.getElementById('salaryAmount').value = '';
+          document.getElementById('curLoanName').value = '';
+          document.getElementById('curLoanAmount').value = '';
+          document.getElementById('prevLoanName').value = '';
+          document.getElementById('prevLoanAmount').value = '';
+      }
+  }
+
+  // Functions to format number inputs (e.g., 10000 -> 10,000.00)
+  function formatInput(e) {
+    const val = num(e.target.value); 
+    if (!isNaN(val) && val !== 0) {
+      e.target.value = val.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    } else if (e.target.value.trim() !== '') {
+      e.target.value = '0'; 
+    } else {
+      e.target.value = '';
+    }
+    // Save data after formatting on blur
+    saveDataToLocalStorage(); 
+  }
+
+  // Removes formatting on focus so the user can easily type numbers
+  function unformatInput(e) {
+    const val = num(e.target.value); 
+    if (val !== 0) {
+      e.target.value = val;
+    } else {
+      e.target.value = '';
+    }
+  }
+
+
+  // --- PERSISTENCE FUNCTIONS ---
+
+  // Saves all data arrays and input values to Local Storage
+  function saveDataToLocalStorage() {
+    const data = {
+        le: loadingExpenses,
+        repairs: repairs,
+        salaries: salaries,
+        curLoans: currentLoans,
+        prevLoans: previousLoans,
+        inputs: {}
+    };
+    PERSISTENT_INPUT_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            // For formatted inputs (which use commas), save the raw number
+            const rawValue = ['dieselLiters', 'dieselRate', 'boatValue'].includes(id) 
+                ? num(el.value) 
+                : el.value;
+            data.inputs[id] = rawValue;
+        }
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  // Loads data from Local Storage on page load
+  function loadDataFromLocalStorage() {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    const today = new Date().toISOString().slice(0,10);
+
+    if (!savedData) {
+        // Initialize with defaults if no data is found
+        document.getElementById('depDate').value = today;
+        document.getElementById('dieselRate').value = '277';
+        document.getElementById('boatValue').value = '10000000';
+        updateDiesel(); 
+        renderRepairs(); 
+        return;
+    }
+
+    const data = JSON.parse(savedData);
+    
+    // Load arrays (reassigning let variables)
+    loadingExpenses = data.le || [];
+    repairs = data.repairs || [];
+    salaries = data.salaries || [];
+    currentLoans = data.curLoans || [];
+    previousLoans = data.prevLoans || [];
+
+    // Load input values
+    PERSISTENT_INPUT_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        const savedValue = data.inputs[id];
+        if (el && savedValue !== undefined) {
+            el.value = savedValue;
+            
+            // Re-apply formatting for numeric inputs like dieselRate/boatValue
+            if (['dieselLiters', 'dieselRate', 'boatValue'].includes(id)) {
+                // Apply the saved raw number value, then format it visually
+                el.value = savedValue;
+                formatInput({ target: el });
+            }
+        }
+    });
+
+    // Ensure date defaults to today if none was loaded
+    if (!document.getElementById('depDate').value) {
+        document.getElementById('depDate').value = today;
+    }
+
+    // Re-render UI based on loaded data
+    renderLE();
+    updateDiesel();
+    renderRepairs();
+    renderSalaries();
+    renderLoans();
+    showUIMessage("Data loaded successfully from last session.", 'info');
+  }
+  
+  // Clears all data, both in Local Storage and on the UI
+  function clearAllDataAndUI() {
+    // 1. Clear localStorage
+    localStorage.removeItem(STORAGE_KEY);
+    
+    // 2. Reset arrays
+    loadingExpenses = [];
+    repairs = [];
+    salaries = [];
+    currentLoans = [];
+    previousLoans = [];
+
+    // 3. Reset input fields to defaults/empty
+    const today = new Date().toISOString().slice(0,10);
+    document.getElementById('depDate').value = today;
+    document.getElementById('depBoat').value = '';
+    
+    // Numeric inputs reset
+    document.getElementById('dieselLiters').value = '0';
+    document.getElementById('dieselRate').value = '277';
+    document.getElementById('boatValue').value = '10000000'; 
+    formatInput({ target: document.getElementById('boatValue') }); // Format it
+    
+    document.getElementById('depNotes').value = '';
+
+    // Clear list input fields and reset edit state
+    resetEditState('leActionBtn', 'Add Cost', true); 
+    resetEditState('repairActionBtn', 'Add Repair', true); 
+    resetEditState('salaryActionBtn', 'Add Salary', true); 
+    resetEditState('curLoanActionBtn', 'Add', true); 
+    resetEditState('prevLoanActionBtn', 'Add', true); 
+
+    // 4. Re-render UI (which will show 0.00 for totals)
+    renderLE();
+    updateDiesel();
+    renderRepairs();
+    renderSalaries();
+    renderLoans();
+    
+    // 5. Display success message
+    showUIMessage("All report data has been cleared and reset.", 'success');
+  }
+
 
   /* ----------------------
-     DEPARTURE: Loading Expenses
+     DEPARTURE: Loading Expenses Logic
      ---------------------- */
-  const loadingExpenses = [];
   function renderLE(){
     const tbody = document.querySelector('#leTable tbody');
     tbody.innerHTML = '';
@@ -313,73 +502,131 @@
       total += num(it.amount);
       const tr = tbody.insertRow();
       tr.innerHTML = `<td>${it.item}</td><td class="right">${fmt(it.amount)}</td>`;
-      tr.insertCell(2).appendChild(createRemoveButton(() => removeLE(idx)));
+      const cellActions = tr.insertCell(2);
+      cellActions.appendChild(createRemoveButton(() => removeLE(idx)));
+      cellActions.appendChild(createEditButton(() => startEditLE(idx)));
     });
     document.getElementById('leTotal').textContent = fmt(total);
     document.getElementById('summary_le').textContent = fmt(total);
-    updateDepartureGrand(); // Still need to update summaries
+    updateDepartureGrand();
+    saveDataToLocalStorage(); // Save after rendering/updating list
   }
-  function addLoadingExpense(){
-    // Uses new num() function, so it will parse "1,000" correctly
+  
+  function startEditLE(index) {
+      const item = loadingExpenses[index];
+      document.getElementById('leItem').value = item.item;
+      document.getElementById('lePrice').value = item.amount;
+      unformatInput({ target: document.getElementById('lePrice') });
+      
+      editingState = { array: 'le', index: index };
+      const btn = document.getElementById('leActionBtn');
+      btn.textContent = 'Save Edit';
+      btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+      btn.classList.add('bg-green-600', 'hover:bg-green-700');
+
+      showUIMessage(`Editing expense: ${item.item}`, 'info');
+      btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function handleLEAction(){
     const item = document.getElementById('leItem').value.trim();
     const price = num(document.getElementById('lePrice').value);
-    if(!item || price <= 0) { console.warn('Enter item and positive price'); return; }
-    loadingExpenses.push({item, amount: price});
-    document.getElementById('leItem').value=''; document.getElementById('lePrice').value='';
+    
+    if(!item || price <= 0) { showUIMessage('Please enter an item description and a positive price.', 'error'); return; }
+
+    if (editingState.array === 'le') {
+        // SAVE EDIT LOGIC
+        loadingExpenses[editingState.index] = { item, amount: price };
+        showUIMessage("Loading Expense edited successfully!", 'success');
+    } else {
+        // ADD NEW LOGIC
+        loadingExpenses.push({item, amount: price});
+        showUIMessage("New Loading Expense added.", 'success');
+    }
+    
+    // RESET UI STATE
+    resetEditState('leActionBtn', 'Add Cost', true);
     renderLE();
   }
+  
   function removeLE(i){ loadingExpenses.splice(i,1); renderLE(); }
 
+
   /* ----------------------
-     DEPARTURE: Diesel
+     DEPARTURE: Diesel Logic (No Edit needed here, only inputs)
      ---------------------- */
   function updateDiesel(){
-    // Uses new num() function
     const liters = num(document.getElementById('dieselLiters').value);
     const rate = num(document.getElementById('dieselRate').value);
     const total = liters * rate;
     document.getElementById('dieselTotal').textContent = fmt(total);
     document.getElementById('summary_diesel').textContent = fmt(total);
-    updateDepartureGrand(); // Still need to update summaries
+    updateDepartureGrand();
   }
-  document.getElementById('dieselLiters').addEventListener('input', updateDiesel);
-  document.getElementById('dieselRate').addEventListener('input', updateDiesel);
 
   /* ----------------------
-     DEPARTURE: Repairs
+     DEPARTURE: Repairs Logic
      ---------------------- */
-  const repairs = [];
   function renderRepairs(){
     const tbody = document.querySelector('#repairTable tbody');
     tbody.innerHTML = '';
-    // Uses new num() function
     let total = num(document.getElementById('boatValue').value);
     repairs.forEach((r, i) => {
       total += num(r.cost);
       const tr = tbody.insertRow();
       tr.innerHTML = `<td>${r.desc}</td><td class="right">${fmt(r.cost)}</td>`;
-      tr.insertCell(2).appendChild(createRemoveButton(() => removeRepair(i)));
+      const cellActions = tr.insertCell(2);
+      cellActions.appendChild(createRemoveButton(() => removeRepair(i)));
+      cellActions.appendChild(createEditButton(() => startEditRepair(i)));
     });
     document.getElementById('repairsTotal').textContent = fmt(total);
     document.getElementById('summary_repairs').textContent = fmt(total);
-    updateDepartureGrand(); // Still need to update summaries
+    updateDepartureGrand();
+    saveDataToLocalStorage(); 
   }
-  function addRepair(){
+
+  function startEditRepair(index) {
+      const item = repairs[index];
+      document.getElementById('repairDesc').value = item.desc;
+      document.getElementById('repairCost').value = item.cost;
+      unformatInput({ target: document.getElementById('repairCost') });
+      
+      editingState = { array: 'repairs', index: index };
+      const btn = document.getElementById('repairActionBtn');
+      btn.textContent = 'Save Edit';
+      btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+      btn.classList.add('bg-green-600', 'hover:bg-green-700');
+
+      showUIMessage(`Editing repair: ${item.desc}`, 'info');
+      btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function handleRepairAction(){
     const desc = document.getElementById('repairDesc').value.trim();
-    // Uses new num() function
     const cost = num(document.getElementById('repairCost').value);
-    if(cost <= 0){ console.warn('Enter positive repair cost'); return; } // Allow empty description
-    repairs.push({desc: desc || "Repair/Maintenance", cost});
-    document.getElementById('repairDesc').value=''; document.getElementById('repairCost').value='';
+
+    if(cost <= 0){ showUIMessage('Please enter a positive repair cost.', 'error'); return; }
+
+    if (editingState.array === 'repairs') {
+        // SAVE EDIT LOGIC
+        repairs[editingState.index] = { desc: desc || "Repair/Maintenance", cost };
+        showUIMessage("Repair edited successfully!", 'success');
+    } else {
+        // ADD NEW LOGIC
+        repairs.push({desc: desc || "Repair/Maintenance", cost});
+        showUIMessage("New Repair added.", 'success');
+    }
+
+    // RESET UI STATE
+    resetEditState('repairActionBtn', 'Add Repair', true);
     renderRepairs();
   }
+  
   function removeRepair(i){ repairs.splice(i,1); renderRepairs(); }
-  document.getElementById('boatValue').addEventListener('input', renderRepairs);
 
   /* ----------------------
-     DEPARTURE: Salaries (NEW)
+     DEPARTURE: Salaries Logic
      ---------------------- */
-  const salaries = [];
   function renderSalaries(){
     const tbody = document.querySelector('#salaryTable tbody');
     tbody.innerHTML = '';
@@ -388,31 +635,61 @@
       total += num(s.amount);
       const tr = tbody.insertRow();
       tr.innerHTML = `<td>${s.name}</td><td class="right">${fmt(s.amount)}</td>`;
-      tr.insertCell(2).appendChild(createRemoveButton(() => removeSalaries(i)));
+      const cellActions = tr.insertCell(2);
+      cellActions.appendChild(createRemoveButton(() => removeSalaries(i)));
+      cellActions.appendChild(createEditButton(() => startEditSalary(i)));
     });
     document.getElementById('salaryTotal').textContent = fmt(total);
     document.getElementById('summary_salary').textContent = fmt(total);
-    updateDepartureGrand(); // Still need to update summaries
+    updateDepartureGrand();
+    saveDataToLocalStorage(); 
   }
-  function addSalaries(){
+
+  function startEditSalary(index) {
+      const item = salaries[index];
+      document.getElementById('salaryName').value = item.name;
+      document.getElementById('salaryAmount').value = item.amount;
+      unformatInput({ target: document.getElementById('salaryAmount') });
+      
+      editingState = { array: 'salaries', index: index };
+      const btn = document.getElementById('salaryActionBtn');
+      btn.textContent = 'Save Edit';
+      btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+      btn.classList.add('bg-green-600', 'hover:bg-green-700');
+
+      showUIMessage(`Editing salary for: ${item.name}`, 'info');
+      btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function handleSalaryAction(){
     const name = document.getElementById('salaryName').value.trim();
-    // Uses new num() function
     const amount = num(document.getElementById('salaryAmount').value);
-    if(!name || amount <= 0){ console.warn('Enter name and positive salary amount'); return; }
-    salaries.push({name, amount});
-    document.getElementById('salaryName').value=''; document.getElementById('salaryAmount').value='';
+    
+    if(!name || amount <= 0){ showUIMessage('Please enter an employee name and a positive salary amount.', 'error'); return; }
+
+    if (editingState.array === 'salaries') {
+        // SAVE EDIT LOGIC
+        salaries[editingState.index] = { name, amount };
+        showUIMessage("Salary edited successfully!", 'success');
+    } else {
+        // ADD NEW LOGIC
+        salaries.push({name, amount});
+        showUIMessage("New Salary added.", 'success');
+    }
+    
+    // RESET UI STATE
+    resetEditState('salaryActionBtn', 'Add Salary', true);
     renderSalaries();
   }
+  
   function removeSalaries(i){ salaries.splice(i,1); renderSalaries(); }
 
 
   /* ----------------------
-     DEPARTURE: Loans
+     DEPARTURE: Loans Logic
      ---------------------- */
-  const currentLoans = [];
-  const previousLoans = [];
   function renderLoans(){
-    // Current
+    // Current Loans
     let tbodyCur = document.querySelector('#curLoanTable tbody');
     tbodyCur.innerHTML = '';
     let curTotal = 0;
@@ -420,9 +697,12 @@
       curTotal += num(l.amount);
       const tr = tbodyCur.insertRow();
       tr.innerHTML = `<td>${l.name}</td><td class="right">${fmt(l.amount)}</td>`;
-      tr.insertCell(2).appendChild(createRemoveButton(() => removeLoan('current', i)));
+      const cellActions = tr.insertCell(2);
+      cellActions.appendChild(createRemoveButton(() => removeLoan('current', i)));
+      cellActions.appendChild(createEditButton(() => startEditLoan('current', i)));
     });
-    // Previous
+
+    // Previous Loans
     let tbodyPrev = document.querySelector('#prevLoanTable tbody');
     tbodyPrev.innerHTML = '';
     let prevTotal = 0;
@@ -430,31 +710,77 @@
       prevTotal += num(l.amount);
       const tr = tbodyPrev.insertRow();
       tr.innerHTML = `<td>${l.name}</td><td class="right">${fmt(l.amount)}</td>`;
-      tr.insertCell(2).appendChild(createRemoveButton(() => removeLoan('previous', i)));
+      const cellActions = tr.insertCell(2);
+      cellActions.appendChild(createRemoveButton(() => removeLoan('previous', i)));
+      cellActions.appendChild(createEditButton(() => startEditLoan('previous', i)));
     });
+
     const loanTotal = curTotal + prevTotal;
     document.getElementById('loanTotal').textContent = fmt(loanTotal);
-    document.getElementById('summary_loans').textContent = fmt(loanTotal); // Update summary
-    updateDepartureGrand(); // Still need to update summaries
+    document.getElementById('summary_loans').textContent = fmt(loanTotal);
+    updateDepartureGrand();
+    saveDataToLocalStorage();
   }
-  function addLoan(which){
-    if(which === 'current'){
-      const name = document.getElementById('curLoanName').value.trim();
-      // Uses new num() function
-      const amt = num(document.getElementById('curLoanAmount').value);
-      if(!name || amt <= 0) { console.warn('Enter name and positive amount'); return; }
-      currentLoans.push({name, amount: amt});
-      document.getElementById('curLoanName').value=''; document.getElementById('curLoanAmount').value='';
+
+  function startEditLoan(which, index) {
+      const array = which === 'current' ? currentLoans : previousLoans;
+      const item = array[index];
+      const nameInputId = which === 'current' ? 'curLoanName' : 'prevLoanName';
+      const amountInputId = which === 'current' ? 'curLoanAmount' : 'prevLoanAmount';
+      const actionButtonId = which === 'current' ? 'curLoanActionBtn' : 'prevLoanActionBtn';
+      
+      document.getElementById(nameInputId).value = item.name;
+      document.getElementById(amountInputId).value = item.amount;
+      unformatInput({ target: document.getElementById(amountInputId) });
+      
+      // Clear the other loan form if it's currently in an edit state
+      const otherWhich = which === 'current' ? 'previous' : 'current';
+      const otherButtonId = which === 'current' ? 'prevLoanActionBtn' : 'curLoanActionBtn';
+      if (editingState.array === otherWhich) {
+          resetEditState(otherButtonId, 'Add', false);
+      }
+
+      editingState = { array: which, index: index };
+      const btn = document.getElementById(actionButtonId);
+      btn.textContent = 'Save Edit';
+      btn.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+      btn.classList.add('bg-green-600', 'hover:bg-green-700');
+
+      showUIMessage(`Editing ${which} loan for: ${item.name}`, 'info');
+      btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  
+  function handleLoanAction(which){
+    const nameInputId = which === 'current' ? 'curLoanName' : 'prevLoanName';
+    const amountInputId = which === 'current' ? 'curLoanAmount' : 'prevLoanAmount';
+    const actionButtonId = which === 'current' ? 'curLoanActionBtn' : 'prevLoanActionBtn';
+    
+    const name = document.getElementById(nameInputId).value.trim();
+    const amount = num(document.getElementById(amountInputId).value);
+
+    if(!name || amount <= 0) { showUIMessage(`Enter name and positive amount for ${which} loan.`, 'error'); return; }
+
+    if (editingState.array === which) {
+        // SAVE EDIT LOGIC
+        const array = which === 'current' ? currentLoans : previousLoans;
+        array[editingState.index] = { name, amount };
+        showUIMessage(`${which} Loan edited successfully!`, 'success');
+        resetEditState(actionButtonId, 'Add', true);
     } else {
-      const name = document.getElementById('prevLoanName').value.trim();
-      // Uses new num() function
-      const amt = num(document.getElementById('prevLoanAmount').value);
-      if(!name || amt <= 0) { console.warn('Enter name and positive amount'); return; }
-      previousLoans.push({name, amount: amt});
-      document.getElementById('prevLoanName').value=''; document.getElementById('prevLoanAmount').value='';
+        // ADD NEW LOGIC
+        if(which === 'current'){
+          currentLoans.push({name, amount: amount});
+        } else {
+          previousLoans.push({name, amount: amount});
+        }
+        showUIMessage(`New ${which} Loan added.`, 'success');
+        document.getElementById(nameInputId).value=''; 
+        document.getElementById(amountInputId).value='';
     }
+    
     renderLoans();
   }
+  
   function removeLoan(which,i){
     if(which === 'current') currentLoans.splice(i,1);
     else previousLoans.splice(i,1);
@@ -464,7 +790,6 @@
   /* ----------------------
      DEPARTURE: Grand total
      ---------------------- */
-  // This function now just updates the summary fields. The grand total UI is removed.
   function updateDepartureGrand(){
     const leTotal = loadingExpenses.reduce((s,x)=>s+num(x.amount),0);
     const dieselTotalVal = num(document.getElementById('dieselLiters').value) * num(document.getElementById('dieselRate').value);
@@ -477,14 +802,15 @@
     document.getElementById('summary_le').textContent = fmt(leTotal);
     document.getElementById('summary_diesel').textContent = fmt(dieselTotalVal);
     document.getElementById('summary_loans').textContent = fmt(loanTotalVal);
-    document.getElementById('summary_repairs').textContent = fmt(boatValue + repairsOnlyTotal); // This is Boat Value + Repairs
+    document.getElementById('summary_repairs').textContent = fmt(boatValue + repairsOnlyTotal); 
     document.getElementById('summary_salary').textContent = fmt(salaryTotalVal);
   }
 
   /* ----------------------
-     DEPARTURE: PDF Export (MODIFIED)
+     DEPARTURE: PDF Export
      ---------------------- */
   function exportDeparturePDF() {
+      // PDF generation logic (using jspdf-autotable) is omitted for brevity but is included in the file
       try {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -584,20 +910,19 @@
             startY: y,
             head: [['Departure Report Details', 'Amount (LKR)']],
             body: reportBody,
-            // FOOTER REMOVED as requested
             headStyles: { fillColor: '#4338ca' }, // Darker indigo
             theme: 'grid',
             didDrawPage: (data) => { y = data.cursor.y; }
         });
         
-        // --- NEW: Add Summary Table ---
+        // --- Summary Table ---
         y = doc.autoTable.previous.finalY + 10; // Get y from previous table
 
         const summaryBody = [
           ['Boat Loading cost', { content: pdfNum(leTotal), styles: rightAlign }],
           ['Diesel', { content: pdfNum(dieselTotal), styles: rightAlign }],
           ['Total Due Loans', { content: pdfNum(loanTotal), styles: rightAlign }],
-          ['Current Value of the Boat', { content: pdfNum(repairsTotalWithValue), styles: rightAlign }], // This is summary_repairs
+          ['Current Value of the Boat', { content: pdfNum(repairsTotalWithValue), styles: rightAlign }], 
           ['Salaries', { content: pdfNum(salaryTotal), styles: rightAlign }]
         ];
         
@@ -608,18 +933,18 @@
             headStyles: { fillColor: '#4338ca' }, // Indigo
             bodyStyles: {
                 fontStyle: 'bold',
-                textColor: '#0000FF', // Blue
-                fontSize: 11 // Slightly larger than default 10
+                textColor: '#1d4ed8', // Taildind blue-700
+                fontSize: 11 
             },
             theme: 'grid',
             didDrawPage: (data) => { y = data.cursor.y; }
         });
         
-        // --- NEW: Add Notes to PDF ---
-        y = doc.autoTable.previous.finalY + 10; // Get y from summary table
+        // --- Add Notes to PDF ---
+        y = doc.autoTable.previous.finalY + 10; 
         const notes = document.getElementById('depNotes').value;
         
-        if (y > 260) { // Check if new page is needed for notes
+        if (y > 260) { 
              doc.addPage();
              y = 15;
         }
@@ -631,59 +956,73 @@
             y += 6;
             doc.setFont(undefined, 'normal');
             doc.setFontSize(10);
-            // Use splitTextToSize for auto-wrapping
             const wrappedNotes = doc.splitTextToSize(notes, rightMargin - margin); 
             doc.text(wrappedNotes, margin, y);
-            y += (wrappedNotes.length * 4) + 5; // Adjust y based on note length
+            y += (wrappedNotes.length * 4) + 5;
         }
 
 
         doc.save(`Departure_Report_${document.getElementById('depDate').value}_${document.getElementById('depBoat').value || 'NoBoat'}.pdf`);
     } catch(e) {
         console.error("Error generating PDF:", e);
-        console.warn("Could not generate PDF. Check console for errors.");
+        showUIMessage("Could not generate PDF. Check console for errors.", 'error');
     }
   }
 
-  // All Arrival PDF and helper functions removed
-  
-
   /* ----------------------
-     Wire up event handlers
+     Wire up event handlers and Initialization
      ---------------------- */
+  
+  function attachPersistenceListeners() {
+    // Listen for changes on simple text/date/textarea inputs for instant saving
+    PERSISTENT_INPUT_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (['depDate', 'depBoat', 'depNotes'].includes(id)) {
+                el.addEventListener('input', saveDataToLocalStorage);
+            }
+            // Numeric inputs (dieselLiters, boatValue, etc.) handle saving in formatInput (on blur)
+        }
+    });
+  }
+
   // Make functions globally accessible for onclick attributes
-  // NEW: Add formatting functions to window
   window.formatInput = formatInput;
   window.unformatInput = unformatInput;
-  // showSection removed
-  window.addLoadingExpense = addLoadingExpense;
+  
+  // Use new unified handlers
+  window.handleLEAction = handleLEAction;
   window.removeLE = removeLE;
-  window.addRepair = addRepair;
+  window.handleRepairAction = handleRepairAction;
   window.removeRepair = removeRepair;
-  window.addSalaries = addSalaries;
+  window.handleSalaryAction = handleSalaryAction;
   window.removeSalaries = removeSalaries;
-  window.addLoan = addLoan;
+  window.handleLoanAction = handleLoanAction;
   window.removeLoan = removeLoan;
+  
   window.exportDeparturePDF = exportDeparturePDF;
-  // All Arrival functions removed from window
+  window.clearAllDataAndUI = clearAllDataAndUI;
+  window.updateDiesel = updateDiesel; // Ensure updateDiesel is public
 
-  // Basic init
-  renderLE();
-  updateDiesel();
-  renderRepairs();
-  renderSalaries();
-  renderLoans();
-  // All Arrival inits removed
-
+  // Initial Data Load and Setup on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    loadDataFromLocalStorage();
+    attachPersistenceListeners();
+    // Also attach to notes input immediately to ensure persistence is hooked
+    const depNotes = document.getElementById('depNotes');
+    if (depNotes) depNotes.addEventListener('input', saveDataToLocalStorage);
+  });
+  
   // Keyboard-friendly quick-add using Enter
   document.querySelectorAll('input').forEach(i=>{
     i.addEventListener('keydown', (e)=>{
       if(e.key === 'Enter'){
         const id = e.target.id;
-        if(id==='lePrice' || id==='leItem') addLoadingExpense();
-        if(id==='repairCost' || id==='repairDesc') addRepair();
-        if(id==='salaryAmount' || id==='salaryName') addSalaries();
-        // All Arrival keydown listeners removed
+        if(id==='lePrice' || id==='leItem') handleLEAction();
+        if(id==='repairCost' || id==='repairDesc') handleRepairAction();
+        if(id==='salaryAmount' || id==='salaryName') handleSalaryAction();
+        if(id==='curLoanAmount' || id==='curLoanName') handleLoanAction('current');
+        if(id==='prevLoanAmount' || id==='prevLoanName') handleLoanAction('previous');
       }
     });
   });
